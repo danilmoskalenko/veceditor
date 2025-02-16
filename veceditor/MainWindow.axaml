@@ -5,5 +5,5 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="veceditor.MainWindow"
         Title="veceditor">
-    Welcome to Avalonia!
+    Welcome to Primernaya brigada!
 </Window>
