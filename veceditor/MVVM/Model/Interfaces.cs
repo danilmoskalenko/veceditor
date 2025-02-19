@@ -40,7 +40,7 @@ namespace veceditor.MVVM.Model
         void Reflection(Point ax1, Point ax2);
         IEnumerable<IDrawableFigure> GetDrawFigures();
         bool IsClosed { get; }
-
-    }
+      string Name { get; set; }
+   }
 
 }
