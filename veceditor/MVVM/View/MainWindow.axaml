@@ -5,5 +5,5 @@
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
         x:Class="veceditor.MainWindow"
         Title="veceditor">
-    Welcome to Primernaya brigada! Еще текст.
+	<Image x:Name="Picture"/>
 </Window>
