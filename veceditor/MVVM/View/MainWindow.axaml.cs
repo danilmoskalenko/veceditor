@@ -3,10 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using DynamicData;
 using DynamicData.Alias;
-using Paint2.ViewModels;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using vecedidor.MVVM.ViewModel;
 
 namespace veceditor
 {

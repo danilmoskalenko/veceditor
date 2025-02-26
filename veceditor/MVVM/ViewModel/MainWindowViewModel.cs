@@ -1,4 +1,6 @@
-﻿namespace Paint2.ViewModels
+﻿using vecedidor.MVVM.ViewModel;
+
+namespace veceditor.MVVM.ViewModel
 {
     public partial class MainWindowViewModel : ViewModelBase
     {

@@ -4,9 +4,9 @@ using ReactiveUI.Fody.Helpers;
 using System.Reactive;
 using DynamicData;
 using System.Reactive.Linq;
-using Interfaces;
+using veceditor.MVVM.Model;
 
-namespace Paint2.ViewModels
+namespace vecedidor.MVVM.ViewModel
 {
     public class ViewModelBase : ReactiveObject
     {
