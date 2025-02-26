@@ -21,6 +21,17 @@ namespace veceditor
          InitializeComponent();
          vm.Figures.Connect().Select(f => f.Name).SortAndBind(out figures);
          vm.Figures.CountChanged.Subscribe(c => { });
+            vm.FileQuestion.RegisterHandler(async context =>
+            {
+                var picker = await this.StorageProvider.OpenFilePickerAsync(new()
+                {
+                    Title = context.Input,
+                    AllowMultiple = false
+                });
+                var file = picker.FirstOrDefault();
+                if (file != null)
+                    context.SetOutput(file.Path.ToString());
+            });
          Draw();
       }
       void Draw()
