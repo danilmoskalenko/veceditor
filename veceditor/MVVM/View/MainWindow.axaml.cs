@@ -3,10 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using DynamicData;
 using DynamicData.Alias;
-using Paint2.ViewModels;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using vecedidor.MVVM.ViewModel;
 
 namespace veceditor
 {
@@ -21,6 +22,17 @@ namespace veceditor
          InitializeComponent();
          vm.Figures.Connect().Select(f => f.Name).SortAndBind(out figures);
          vm.Figures.CountChanged.Subscribe(c => { });
+            vm.FileQuestion.RegisterHandler(async context =>
+            {
+                var picker = await this.StorageProvider.OpenFilePickerAsync(new()
+                {
+                    Title = context.Input,
+                    AllowMultiple = false
+                });
+                var file = picker.FirstOrDefault();
+                if (file != null)
+                    context.SetOutput(file.Path.ToString());
+            });
          Draw();
       }
       void Draw()

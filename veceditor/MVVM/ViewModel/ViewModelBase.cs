@@ -3,10 +3,10 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System.Reactive;
 using DynamicData;
-using veceditor.MVVM.Model;
 using System.Reactive.Linq;
+using veceditor.MVVM.Model;
 
-namespace Paint2.ViewModels
+namespace vecedidor.MVVM.ViewModel
 {
     public class ViewModelBase : ReactiveObject
     {
@@ -24,11 +24,19 @@ namespace Paint2.ViewModels
 
          Delete = ReactiveCommand.Create(() =>  Figures.Remove(SelectedFigure),
             this.WhenAnyValue(t=>t.SelectedFigure).Select(f=>f != null));
-      }
+
+            Open = ReactiveCommand.CreateFromTask(async () =>
+            {
+                var file = await FileQuestion.Handle("Select file for open");
+            });
+
+        }
+        public Interaction<string, string> FileQuestion { get; } = new();
 
 
       public ReactiveCommand<Unit,Unit> Delete { get; }
+        public ReactiveCommand<Unit, Unit> Open { get; }
 
 
-   }
+    }
 }
