@@ -1,71 +1,45 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Media;
-using DynamicData;
-using DynamicData.Alias;
-using SkiaSharp;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using vecedidor.MVVM.ViewModel;
+using System.Collections.Generic;
 
 namespace veceditor
 {
    public partial class MainWindow : Window
    {
+      private Canvas? _canvas;
+      private List<Point> _points = new();
 
-      ViewModelBase vm = new ();
-      ReadOnlyObservableCollection<string> figures;
-      public ReadOnlyObservableCollection<string> Figures => Figures;
       public MainWindow()
       {
          InitializeComponent();
-         vm.Figures.Connect().Select(f => f.Name).SortAndBind(out figures);
-         vm.Figures.CountChanged.Subscribe(c => { });
-            vm.FileQuestion.RegisterHandler(async context =>
-            {
-                var picker = await this.StorageProvider.OpenFilePickerAsync(new()
-                {
-                    Title = context.Input,
-                    AllowMultiple = false
-                });
-                var file = picker.FirstOrDefault();
-                if (file != null)
-                    context.SetOutput(file.Path.ToString());
-            });
-         Draw();
+         _canvas = this.FindControl<Canvas>("DrawingCanvas");
+         PointerPressed += OnPointerPressed;
       }
-      void Draw()
+
+      private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
-         Pen shapeOutlinePen = new Pen(Brushes.Black, 2);
+         if (_canvas == null) return;
 
-         // Create a DrawingGroup
-         DrawingGroup dGroup = new DrawingGroup();
+         var point = e.GetPosition(_canvas); //Координаты относительно канваса
+         _points.Add(point);
 
-         // Obtain a DrawingContext from 
-         // the DrawingGroup.
-         using (DrawingContext dc = dGroup.Open())
+         // Создаём точку в виде эллипса
+         var ellipse = new Ellipse
          {
-            // Draw a rectangle at full opacity.
-            dc.DrawRectangle(Brushes.Blue, shapeOutlinePen, new Rect(0, 0, 25, 25));
+            Width = 6,
+            Height = 6,
+            Fill = Brushes.Black
+         };
 
-            // This rectangle is drawn at 50% opacity.
-            dc.DrawRectangle(Brushes.Blue, shapeOutlinePen, new Rect(25, 25, 25, 25));
+         // Устанавливаем координаты
+         Canvas.SetLeft(ellipse, point.X - 3); //-3 для центра
+         Canvas.SetTop(ellipse, point.Y - 3);
 
-            // This rectangle is blurred and drawn at 50% opacity (0.5 x 0.5). 
-            dc.DrawRectangle(Brushes.Blue, shapeOutlinePen, new Rect(50, 50, 25, 25));
-
-            // This rectangle is also blurred and drawn at 50% opacity.
-            dc.DrawRectangle(Brushes.Blue, shapeOutlinePen, new Rect(75, 75, 25, 25));
-
-
-            // This rectangle is drawn at 50% opacity with no blur effect.
-            dc.DrawRectangle(Brushes.Blue, shapeOutlinePen, new Rect(100, 100, 25, 25));
-            //                dc.DrawGeometry(Brushes.Red, shapeOutlinePen,new PathGeometry();
-            //https://learn.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/path-markup-syntax?view=netframeworkdesktop-4.8
-         }
-         DrawingImage drawing = new(dGroup);
-         Picture.Source = drawing;
+         // Добавляем точку на Canvas
+         _canvas.Children.Add(ellipse);
       }
    }
 }
