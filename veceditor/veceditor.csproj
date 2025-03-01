@@ -32,4 +32,10 @@
     <PackageReference Include="DynamicData" Version="9.1.2" />
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Icons\icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
 </Project>

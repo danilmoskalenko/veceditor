@@ -3,5 +3,38 @@
         x:Class="veceditor.MainWindow"
         Title="veceditor"
         Width="900" Height="500">
-	<Canvas x:Name="DrawingCanvas" Background="White"/>
+    <Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />  
+        <ColumnDefinition Width="60" /> <!-- Фиксированная ширина панели с кнопками -->
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />  <!-- Панель растягивается на всю высоту -->
+    </Grid.RowDefinitions>
+
+    <!-- Холст для рисования -->
+    <Canvas x:Name="DrawingCanvas" Background="White" Grid.Column="0" />
+
+    <!-- Правая панель с кнопками -->
+    <Grid Grid.Column="1" Background="Gray">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+            <Button Width="40" Height="40">
+                <Image Source="avares://veceditor/Icons/icon.png"/>
+            </Button>
+            <Button Width="40" Height="40">
+                <Image Source="avares://veceditor/Icons/icon.png"/>
+            </Button>
+            <Button Width="40" Height="40">
+                <Image Source="avares://veceditor/Icons/icon.png"/>
+            </Button>
+            <Button Width="40" Height="40">
+                <Image Source="avares://veceditor/Icons/icon.png"/>
+            </Button>
+            <Button Width="40" Height="40">
+                <Image Source="avares://veceditor/Icons/icon.png"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Grid>
+
 </Window>
