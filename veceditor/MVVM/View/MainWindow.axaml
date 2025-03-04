@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
         x:Class="veceditor.MainWindow"
         Title="veceditor"
         Width="900" Height="500">
@@ -19,10 +20,10 @@
     <Grid Grid.Column="1" Background="Gray">
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
             <Button Width="40" Height="40">
-                <Image Source="avares://veceditor/Icons/icon.png"/>
+                <Image Source="{SvgImage avares://veceditor/Icons/undo.svg}"/>
             </Button>
             <Button Width="40" Height="40">
-                <Image Source="avares://veceditor/Icons/icon.png"/>
+                <Image Source="{SvgImage avares://veceditor/Icons/redo.svg}"/>
             </Button>
             <Button Width="40" Height="40">
                 <Image Source="avares://veceditor/Icons/icon.png"/>

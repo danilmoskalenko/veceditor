@@ -16,12 +16,17 @@
     <EmbeddedResource Remove="MVVM\ModelView\**" />
     <None Remove="Core\**" />
     <None Remove="MVVM\ModelView\**" />
+    <None Remove="Icons\undo.svg" />
+    <AvaloniaResource Include="Icons\undo.svg" />
+    <None Remove="Icons\redo.svg" />
+    <AvaloniaResource Include="Icons\redo.svg" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.4" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.4" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.4" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.4" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
