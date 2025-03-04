@@ -1,4 +1,4 @@
-using Avalonia;
+п»їusing Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -15,9 +15,9 @@ namespace veceditor
       private List<Shape> _shapes = new();
 
       /*
-       * Режим 0 - рисование только точек
-       * Режим 1 - рисование линий
-       * Режим 2 - рисование круга
+       * Р РµР¶РёРј 0 - СЂРёСЃРѕРІР°РЅРёРµ С‚РѕР»СЊРєРѕ С‚РѕС‡РµРє
+       * Р РµР¶РёРј 1 - СЂРёСЃРѕРІР°РЅРёРµ Р»РёРЅРёР№
+       * Р РµР¶РёРј 2 - СЂРёСЃРѕРІР°РЅРёРµ РєСЂСѓРіР°
       */
       private int mode = 0;
 
@@ -35,7 +35,7 @@ namespace veceditor
          var point = e.GetPosition(_canvas);
          _points.Add(point);
 
-         // Режим рисования точки
+         // Р РµР¶РёРј СЂРёСЃРѕРІР°РЅРёСЏ С‚РѕС‡РєРё
          if (mode == 0)
          {
             var ellipse = new Ellipse
@@ -49,11 +49,11 @@ namespace veceditor
             _canvas.Children.Add(ellipse);
             _shapes.Add(ellipse);
 
-            //Пример изменения цвета
+            //РџСЂРёРјРµСЂ РёР·РјРµРЅРµРЅРёСЏ С†РІРµС‚Р°
             if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
          }
 
-         // Режим рисования линии
+         // Р РµР¶РёРј СЂРёСЃРѕРІР°РЅРёСЏ Р»РёРЅРёРё
          else if (mode == 1 && _points.Count % 2 == 0)
          {
             var lineGeom = new LineGeometry
@@ -71,7 +71,7 @@ namespace veceditor
             _shapes.Add(lineShape);
          }
 
-         // Режим рисования круга
+         // Р РµР¶РёРј СЂРёСЃРѕРІР°РЅРёСЏ РєСЂСѓРіР°
          else if (mode == 2 && _points.Count % 2 == 0)
          {
             var center = _points[^2];
