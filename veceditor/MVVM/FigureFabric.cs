@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
+using Avalonia.Threading;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using veceditor.MVVM.Model;
 using Point = veceditor.MVVM.Model.Point;
-
 namespace veceditor.MVVM
 {
    public class Line : IFigure
@@ -72,33 +72,33 @@ namespace veceditor.MVVM
       }
       public void DrawCircle(Point Center, double rad)
       {
-         var circle = new Ellipse
-         {
-            Width = rad * 2,
-            Height = rad * 2,
-            Stroke = Brushes.Black,
-            StrokeThickness = 2
-         };
-         Canvas.SetLeft(circle, Center.x - rad);
-         Canvas.SetTop(circle, Center.y - rad);
-         canvas.Children.Add(circle);
+            var circle = new Ellipse
+            {
+               Width = rad * 2,
+               Height = rad * 2,
+               Stroke = Brushes.Black,
+               StrokeThickness = 2
+            };
+            Canvas.SetLeft(circle, Center.x - rad);
+            Canvas.SetTop(circle, Center.y - rad);
+            canvas.Children.Add(circle);
       }
 
       public void DrawLine(Line line)
       {
-         var lineGeom = new LineGeometry
-         {
-            StartPoint = new Avalonia.Point(line.start.x, line.start.y),
-            EndPoint = new Avalonia.Point(line.end.x, line.end.y)
-         };
-         var lineShape = new Path
-         {
-            Stroke = Brushes.Black,
-            StrokeThickness = 2,
-            Data = lineGeom
-         };
-         line.figure = lineShape;
-         canvas.Children.Add(lineShape);
+            var lineGeom = new LineGeometry
+            {
+               StartPoint = new Avalonia.Point(line.start.x, line.start.y),
+               EndPoint = new Avalonia.Point(line.end.x, line.end.y)
+            };
+            var lineShape = new Path
+            {
+               Stroke = Brushes.Black,
+               StrokeThickness = 2,
+               Data = lineGeom
+            };
+            line.figure = lineShape;
+            canvas.Children.Add(lineShape);
       }
    }
 }

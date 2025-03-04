@@ -13,21 +13,23 @@ namespace veceditor.MVVM
    public class Logic : ILogic
    {
       Canvas canvas;
+      // Хранилище фигур
       public ObservableCollection<IFigure> Figures { get; set; } = new ObservableCollection<IFigure>();
       public Logic(Canvas canvas)
       {
          this.canvas = canvas;
       }
-
+      // Добавление фигур
       public void AddFigure(IFigure figure)
       {
          Figures.Add(figure);
       }
-
+      // Удаление фигур
       public void RemoveFigure(IFigure figure)
       {
          Figures.Remove(figure);
       }
+      // Очистка фигур
       public void ClearFigures()
       {
          Figures.Clear();

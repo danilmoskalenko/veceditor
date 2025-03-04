@@ -3,31 +3,29 @@ using System.Reactive;
 using System.Windows.Input;
 using vecedidor.MVVM.ViewModel;
 using System.Reactive.Linq;
+using Avalonia.Threading;
+using System;
+using Avalonia.Controls.Documents;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace veceditor.MVVM.ViewModel
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-      public ReactiveCommand<FigureType, Unit> SelectLine { get; }
-      public ReactiveCommand<FigureType, Unit> SelectCircle { get; }
+      public ReactiveCommand<Unit, Unit> SelectFigure { get; }
 
       public FigureType _figureType;
+
       public MainWindowViewModel()
       {
          _figureType = FigureType.Line;
-         SelectLine = ReactiveCommand.Create<FigureType>(SelectFigure);
-         SelectCircle = ReactiveCommand.Create<FigureType>(SelectFigure);
+         SelectFigure = ReactiveCommand.Create(Select);
+         SelectFigure.ObserveOn(RxApp.MainThreadScheduler);
       }
-      void SelectFigure(FigureType type)
+      void Select()
       {
-         switch (type)
-         {
-            case FigureType.Line:
-               _figureType = FigureType.Line;
-               break;
-            case FigureType.Circle:
+               //_figureType = FigureType.Line;
                _figureType = FigureType.Circle;
-               break;
-         }
       }
    }
 }

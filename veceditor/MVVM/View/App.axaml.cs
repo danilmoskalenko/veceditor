@@ -16,9 +16,8 @@ namespace veceditor.MVVM.View
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-               MainWindowViewModel viewModel = new MainWindowViewModel();
-               MainWindow main;
-               main = new MainWindow(viewModel)
+               var viewModel = new MainWindowViewModel();
+               var main = new MainWindow(viewModel)
                {
                   DataContext = viewModel
                };

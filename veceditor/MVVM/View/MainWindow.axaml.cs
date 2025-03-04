@@ -3,8 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
@@ -39,6 +42,7 @@ namespace veceditor
       public MainWindow(MainWindowViewModel viewModel)
       {
          InitializeComponent();
+         DataContext = viewModel;
          _canvas = this.FindControl<Canvas>("DrawingCanvas");
          if (_canvas != null)
          {
@@ -70,6 +74,7 @@ namespace veceditor
             Canvas.SetTop(ellipse, point.y - 3);
             _canvas.Children.Add(ellipse);
             _shapes.Add(ellipse);
+            
             //Пример изменения цвета
             if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
          }
@@ -92,7 +97,7 @@ namespace veceditor
             //_shapes.Add(lineShape);
             var line = new Line(_points[^2], _points[^1]);
             _logic.AddFigure(line);
-            renderer.DrawLine(line);        
+            renderer.DrawLine(line);
          }
 
          // Режим рисования круга
