@@ -34,6 +34,9 @@
             <Button Width="40" Height="40">
                 <Image Source="avares://veceditor/Icons/icon.png"/>
             </Button>
+            
+            <ColorPicker/>
+            
         </StackPanel>
     </Grid>
 </Grid>
