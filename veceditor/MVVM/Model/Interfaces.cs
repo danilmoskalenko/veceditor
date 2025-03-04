@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Avalonia;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,11 @@ namespace veceditor.MVVM.Model
     public class Point
     {
         public double x, y;
+        public Point(double x, double y)
+        {
+            this.x = x;
+            this.y = y;
+        }
     }
     public interface IFigureGraphicProperties
     {
@@ -21,6 +28,7 @@ namespace veceditor.MVVM.Model
     public interface IGraphicInterface
     {
         void DrawCircle(Point Center, double rad);
+        void DrawLine(Point start, Point end);
     }
     public interface IDrawableFigure
     {
@@ -41,6 +49,12 @@ namespace veceditor.MVVM.Model
         IEnumerable<IDrawableFigure> GetDrawFigures();
         bool IsClosed { get; }
       string Name { get; set; }
-   }
-
+    }
+    public interface ILogic
+    {
+        ObservableCollection<IFigure> Figures { get; }
+        void AddFigure(IFigure figure);
+        void RemoveFigure(IFigure figure);
+        void ClearFigures();
+    }
 }
