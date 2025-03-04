@@ -12,13 +12,14 @@ namespace veceditor
    {
       private Canvas? _canvas;
       private List<Point> _points = new();
+      private List<Shape> _shapes = new();
 
       /*
        * Режим 0 - рисование только точек
        * Режим 1 - рисование линий
        * Режим 2 - рисование круга
       */
-      private int mode = 2;
+      private int mode = 0;
 
       public MainWindow()
       {
@@ -31,31 +32,34 @@ namespace veceditor
       {
          if (_canvas == null) return;
 
-         var point = e.GetPosition(_canvas); //Координаты относительно канваса
+         var point = e.GetPosition(_canvas);
          _points.Add(point);
 
-         // Создаём точку в виде эллипса
-         var ellipse = new Ellipse
+         // Режим рисования точки
+         if (mode == 0)
          {
-            Width = 6,
-            Height = 6,
-            Fill = Brushes.Black
-         };
+            var ellipse = new Ellipse
+            {
+               Width = 6,
+               Height = 6,
+               Fill = Brushes.Black
+            };
+            Canvas.SetLeft(ellipse, point.X - 3);
+            Canvas.SetTop(ellipse, point.Y - 3);
+            _canvas.Children.Add(ellipse);
+            _shapes.Add(ellipse);
 
-         // Устанавливаем координаты
-         Canvas.SetLeft(ellipse, point.X - 3); //-3 для центра
-         Canvas.SetTop(ellipse, point.Y - 3);
+            //Пример изменения цвета
+            if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
+         }
 
-         // Добавляем точку на Canvas
-         _canvas.Children.Add(ellipse);
-
-         //Отрисовка линии (чисто тестово пока)
-         if(_points.Count % 2 == 0 && mode == 1)
+         // Режим рисования линии
+         else if (mode == 1 && _points.Count % 2 == 0)
          {
             var lineGeom = new LineGeometry
             {
-               StartPoint = _points[^2], //Второй с конца
-               EndPoint = _points[^1] //Последний
+               StartPoint = _points[^2],
+               EndPoint = _points[^1]
             };
             var lineShape = new Path
             {
@@ -64,7 +68,10 @@ namespace veceditor
                Data = lineGeom
             };
             _canvas.Children.Add(lineShape);
+            _shapes.Add(lineShape);
          }
+
+         // Режим рисования круга
          else if (mode == 2 && _points.Count % 2 == 0)
          {
             var center = _points[^2];
@@ -81,8 +88,16 @@ namespace veceditor
             Canvas.SetLeft(circle, center.X - radius);
             Canvas.SetTop(circle, center.Y - radius);
             _canvas.Children.Add(circle);
+            _shapes.Add(circle);
          }
+      }
 
+      public void ChangeColor(Shape shape, Brush newColor)
+      {
+         if (shape is Ellipse ellipse)
+            ellipse.Fill = newColor;
+         else if (shape is Path path)
+            path.Stroke = newColor;
       }
    }
 }
