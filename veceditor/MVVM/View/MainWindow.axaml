@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:veceditor.MVVM.ViewModel"
         x:Class="veceditor.MainWindow"
+		x:DataType ="vm:MainWindowViewModel"
         Title="veceditor"
         Width="900" Height="500">
     <Grid>

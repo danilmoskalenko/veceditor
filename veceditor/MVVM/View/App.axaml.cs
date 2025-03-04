@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using veceditor.MVVM.ViewModel;
 
 namespace veceditor.MVVM.View
 {
@@ -15,7 +16,13 @@ namespace veceditor.MVVM.View
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow();
+               MainWindowViewModel viewModel = new MainWindowViewModel();
+               MainWindow main;
+               main = new MainWindow(viewModel)
+               {
+                  DataContext = viewModel
+               };
+               desktop.MainWindow = main;
             }
 
             base.OnFrameworkInitializationCompleted();

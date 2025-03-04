@@ -5,12 +5,22 @@ using Avalonia.Input;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
+using veceditor.MVVM.ViewModel;
+using Line = veceditor.MVVM.Line;
 using Point = veceditor.MVVM.Model.Point;
 
 namespace veceditor
 {
+   public enum FigureType
+   {
+      Circle,
+      Rectangle,
+      Triangle,
+      Line
+   }
    public partial class MainWindow : Window
    {
       private Canvas? _canvas;
@@ -18,15 +28,15 @@ namespace veceditor
       private List<Shape> _shapes = new();
       private ILogic _logic;
       private DrawingRenderer renderer;
-
+      private MainWindowViewModel viewModel;
       /*
        * Режим 0 - рисование только точек
        * Режим 1 - рисование линий
        * Режим 2 - рисование круга
       */
-      private int mode = 1;
+      private int mode = 0;
 
-      public MainWindow()
+      public MainWindow(MainWindowViewModel viewModel)
       {
          InitializeComponent();
          _canvas = this.FindControl<Canvas>("DrawingCanvas");
@@ -35,6 +45,7 @@ namespace veceditor
             _logic = new Logic(_canvas);
             renderer = new DrawingRenderer(_canvas);
          }
+         this.viewModel = viewModel;
          PointerPressed += OnPointerPressed;
       }
 
@@ -79,7 +90,9 @@ namespace veceditor
             //};
             //_canvas.Children.Add(lineShape);
             //_shapes.Add(lineShape);
-            renderer.DrawLine(_points[^2], _points[^1]);
+            var line = new Line(_points[^2], _points[^1]);
+            _logic.AddFigure(line);
+            renderer.DrawLine(line);        
          }
 
          // Режим рисования круга

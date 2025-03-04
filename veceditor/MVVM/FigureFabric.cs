@@ -15,9 +15,10 @@ namespace veceditor.MVVM
 {
    public class Line : IFigure
    {
-      Point start;
-      Point end;
-      public Line(Point start, Point end)
+      public Point start;
+      public Point end;
+      public Path figure;
+      public Line (Point start, Point end)
       {
          this.start = start;
          this.end = end;
@@ -83,12 +84,12 @@ namespace veceditor.MVVM
          canvas.Children.Add(circle);
       }
 
-      public void DrawLine(Point start, Point end)
+      public void DrawLine(Line line)
       {
          var lineGeom = new LineGeometry
          {
-            StartPoint = new Avalonia.Point(start.x, start.y),
-            EndPoint = new Avalonia.Point(end.x, end.y)
+            StartPoint = new Avalonia.Point(line.start.x, line.start.y),
+            EndPoint = new Avalonia.Point(line.end.x, line.end.y)
          };
          var lineShape = new Path
          {
@@ -96,6 +97,7 @@ namespace veceditor.MVVM
             StrokeThickness = 2,
             Data = lineGeom
          };
+         line.figure = lineShape;
          canvas.Children.Add(lineShape);
       }
    }

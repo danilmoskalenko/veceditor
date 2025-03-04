@@ -28,7 +28,7 @@ namespace veceditor.MVVM.Model
     public interface IGraphicInterface
     {
         void DrawCircle(Point Center, double rad);
-        void DrawLine(Point start, Point end);
+        void DrawLine(Line line);
     }
     public interface IDrawableFigure
     {
