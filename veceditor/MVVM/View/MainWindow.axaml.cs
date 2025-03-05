@@ -31,7 +31,7 @@ namespace veceditor
       private Canvas? _canvas;
       private List<Point> _points = new();
       private List<Shape> _shapes = new();
-      private ILogic _logic;
+
       private DrawingRenderer renderer;
       private MainWindowViewModel viewModel;
 
@@ -52,8 +52,8 @@ namespace veceditor
          _canvas = this.FindControl<Canvas>("DrawingCanvas");
          if (_canvas != null)
          {
+            viewModel._logic = new Logic(_canvas);
             TextBlock();
-            _logic = new Logic(_canvas);
             renderer = new DrawingRenderer(_canvas);
          }
          PointerPressed += OnPointerPressed;
@@ -115,7 +115,6 @@ namespace veceditor
             //_canvas.Children.Add(lineShape);
             //_shapes.Add(lineShape);
             var line = new Line(_points[^2], _points[^1]);
-            _logic.AddFigure(line);
             renderer.DrawLine(line);
          }
 
