@@ -12,6 +12,7 @@ using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
 using veceditor.MVVM.ViewModel;
+using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
 using Point = veceditor.MVVM.Model.Point;
 
@@ -33,6 +34,9 @@ namespace veceditor
       private ILogic _logic;
       private DrawingRenderer renderer;
       private MainWindowViewModel viewModel;
+
+      //Имитация выбранной фигуры
+      TextBlock SelText;
       /*
        * Режим 0 - рисование только точек
        * Режим 1 - рисование линий
@@ -44,16 +48,30 @@ namespace veceditor
       {
          InitializeComponent();
          DataContext = viewModel;
+         this.viewModel = viewModel;
          _canvas = this.FindControl<Canvas>("DrawingCanvas");
          if (_canvas != null)
          {
+            TextBlock();
             _logic = new Logic(_canvas);
             renderer = new DrawingRenderer(_canvas);
          }
-         this.viewModel = viewModel;
          PointerPressed += OnPointerPressed;
       }
-
+      void TextBlock()
+      {
+         SelText = new TextBlock
+         {
+            FontSize = 20,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+            Margin = new Thickness(0, 10, 10, 0),
+            Foreground = Brushes.Red,
+         };
+         SelText.Text = $"{viewModel._figureType}";
+         viewModel.SelText = SelText;
+         _canvas.Children.Add(SelText); 
+      }
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
          if (_canvas == null) return;
