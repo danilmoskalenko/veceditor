@@ -19,6 +19,7 @@ namespace veceditor
 {
    public enum FigureType
    {
+      Point,
       Circle,
       Rectangle,
       Triangle,
@@ -62,7 +63,7 @@ namespace veceditor
          _points.Add(point);
 
          // Режим рисования точки
-         if (mode == 0)
+         if (viewModel._figureType == FigureType.Point)
          {
             var ellipse = new Ellipse
             {
@@ -74,13 +75,13 @@ namespace veceditor
             Canvas.SetTop(ellipse, point.y - 3);
             _canvas.Children.Add(ellipse);
             _shapes.Add(ellipse);
-            
+
             //Пример изменения цвета
             if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
          }
 
          // Режим рисования линии
-         else if (mode == 1 && _points.Count % 2 == 0)
+         else if (viewModel._figureType == FigureType.Line && _points.Count % 2 == 0)
          {
             //var lineGeom = new LineGeometry
             //{
@@ -101,7 +102,7 @@ namespace veceditor
          }
 
          // Режим рисования круга
-         else if (mode == 2 && _points.Count % 2 == 0)
+         else if (viewModel._figureType == FigureType.Circle && _points.Count % 2 == 0)
          {
             //var center = _points[^2];
             //var radiusPoint = _points[^1];

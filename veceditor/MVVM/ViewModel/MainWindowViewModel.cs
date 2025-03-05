@@ -12,20 +12,32 @@ namespace veceditor.MVVM.ViewModel
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-      public ReactiveCommand<Unit, Unit> SelectFigure { get; }
+      public ReactiveCommand<FigureType, Unit> SelectFigure { get; }
 
       public FigureType _figureType;
 
       public MainWindowViewModel()
       {
          _figureType = FigureType.Line;
-         SelectFigure = ReactiveCommand.Create(Select);
+         SelectFigure = ReactiveCommand.Create<FigureType>(Select);
          SelectFigure.ObserveOn(RxApp.MainThreadScheduler);
       }
-      void Select()
+      void Select(FigureType type)
       {
-               //_figureType = FigureType.Line;
-               _figureType = FigureType.Circle;
+         switch (type)
+         {
+            case FigureType.Point:
+               _figureType = type;
+               break;
+            case FigureType.Line:
+               _figureType = type;
+               break;
+            case FigureType.Circle:
+               _figureType = type;
+               break;
+            default:
+               break;
+         }
       }
    }
 }
