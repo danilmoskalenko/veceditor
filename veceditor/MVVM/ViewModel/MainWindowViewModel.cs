@@ -8,6 +8,10 @@ using System;
 using Avalonia.Controls.Documents;
 using static System.Net.Mime.MediaTypeNames;
 using Avalonia.Controls;
+using System.Collections.Generic;
+using Point = veceditor.MVVM.Model.Point;
+using veceditor.MVVM.Model;
+using Avalonia.Rendering;
 
 namespace veceditor.MVVM.ViewModel
 {
@@ -16,6 +20,9 @@ namespace veceditor.MVVM.ViewModel
       public ReactiveCommand<FigureType, Unit> SelectFigure { get; }
       public TextBlock SelText;
       public FigureType _figureType;
+      public List<Point> _points = new();
+      public List<IFigure> tempFigure = new();
+      public DrawingRenderer? renderer;
 
       public MainWindowViewModel()
       {
@@ -26,6 +33,11 @@ namespace veceditor.MVVM.ViewModel
       }
       void Select(FigureType type)
       {
+         _points.Clear();
+         while(tempFigure.Count > 0)
+         {
+           renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0);
+         }
          SelText.Text = $"{type}";
          switch (type)
          {

@@ -17,7 +17,7 @@ namespace veceditor.MVVM
    {
       public Point start;
       public Point end;
-      public Path figure;
+      public Path? figure;
       public Line (Point start, Point end)
       {
          this.start = start;
@@ -42,6 +42,7 @@ namespace veceditor.MVVM
       public Point center;
       public Point radPoint;
       public double rad;
+      public Ellipse? figure;
       public Circle(Point center, Point radPoint)
       {
          this.center = center;
@@ -70,6 +71,38 @@ namespace veceditor.MVVM
       {
          this.canvas = canvas;
       }
+      public void DrawCircle(Circle circleObj)
+      {
+         var circle = new Ellipse
+         {
+            Width = circleObj.rad * 2,
+            Height = circleObj.rad * 2,
+            Stroke = Brushes.Black,
+            StrokeThickness = 2
+         };
+
+         Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
+         Canvas.SetTop(circle, circleObj.center.y - circleObj.rad);
+
+         canvas.Children.Add(circle);
+         circleObj.figure = circle;
+      }
+      public void DrawLine(Line line)
+      {
+         var lineGeom = new LineGeometry
+         {
+            StartPoint = new Avalonia.Point(line.start.x, line.start.y),
+            EndPoint = new Avalonia.Point(line.end.x, line.end.y)
+         };
+         var lineShape = new Path
+         {
+            Stroke = Brushes.Black,
+            StrokeThickness = 2,
+            Data = lineGeom
+         };
+         line.figure = lineShape;
+         canvas.Children.Add(lineShape);
+      }
       public void DrawCircle(Point Center, double rad)
       {
             var circle = new Ellipse
@@ -84,21 +117,26 @@ namespace veceditor.MVVM
             canvas.Children.Add(circle);
       }
 
-      public void DrawLine(Line line)
+      public void Erase(IFigure figure)
       {
-            var lineGeom = new LineGeometry
+         if (figure is Line)
+         {
+            var line = figure as Line;
+            if (line.figure != null)
             {
-               StartPoint = new Avalonia.Point(line.start.x, line.start.y),
-               EndPoint = new Avalonia.Point(line.end.x, line.end.y)
-            };
-            var lineShape = new Path
+               canvas.Children.Remove(line.figure);
+               line.figure = null;
+            }
+         }
+         else if (figure is Circle)
+         {
+            var circle = figure as Circle;
+            if (circle.figure != null)
             {
-               Stroke = Brushes.Black,
-               StrokeThickness = 2,
-               Data = lineGeom
-            };
-            line.figure = lineShape;
-            canvas.Children.Add(lineShape);
+               canvas.Children.Remove(circle.figure);
+               circle.figure = null;
+            }
+         }
       }
    }
 }

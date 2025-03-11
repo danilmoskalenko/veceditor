@@ -4,6 +4,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using DynamicData;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -29,20 +30,12 @@ namespace veceditor
    public partial class MainWindow : Window
    {
       private Canvas? _canvas;
-      private List<Point> _points = new();
       private List<Shape> _shapes = new();
       private ILogic _logic;
-      private DrawingRenderer renderer;
       private MainWindowViewModel viewModel;
 
       //Имитация выбранной фигуры
       TextBlock SelText;
-      /*
-       * Режим 0 - рисование только точек
-       * Режим 1 - рисование линий
-       * Режим 2 - рисование круга
-      */
-      private int mode = 0;
 
       public MainWindow(MainWindowViewModel viewModel)
       {
@@ -54,9 +47,10 @@ namespace veceditor
          {
             TextBlock();
             _logic = new Logic(_canvas);
-            renderer = new DrawingRenderer(_canvas);
+            viewModel.renderer = new DrawingRenderer(_canvas);
          }
          PointerPressed += OnPointerPressed;
+         PointerMoved += OnPointerMoved;
       }
       void TextBlock()
       {
@@ -77,8 +71,12 @@ namespace veceditor
          if (_canvas == null) return;
 
          var Apoint = e.GetPosition(_canvas);
+         if (Apoint.X < 0 || Apoint.Y < 0 || Apoint.X > _canvas.Bounds.Width || Apoint.Y > _canvas.Bounds.Height)
+         {
+            return;
+         }
          Point point = new Point(Apoint.X, Apoint.Y);
-         _points.Add(point);
+         viewModel._points.Add(point);
 
          // Режим рисования точки
          if (viewModel._figureType == FigureType.Point)
@@ -93,52 +91,51 @@ namespace veceditor
             Canvas.SetTop(ellipse, point.y - 3);
             _canvas.Children.Add(ellipse);
             _shapes.Add(ellipse);
+            viewModel._points.Clear();
 
             //Пример изменения цвета
             if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
          }
 
          // Режим рисования линии
-         else if (viewModel._figureType == FigureType.Line && _points.Count % 2 == 0)
+         else if (viewModel._figureType == FigureType.Line && viewModel._points.Count % 2 == 0)
          {
-            //var lineGeom = new LineGeometry
-            //{
-            //   StartPoint = _points[^2],
-            //   EndPoint = _points[^1]
-            //};
-            //var lineShape = new Path
-            //{
-            //   Stroke = Brushes.Black,
-            //   StrokeThickness = 2,
-            //   Data = lineGeom
-            //};
-            //_canvas.Children.Add(lineShape);
-            //_shapes.Add(lineShape);
-            var line = new Line(_points[^2], _points[^1]);
+            var line = new Line(viewModel._points[^2], viewModel._points[^1]);
             _logic.AddFigure(line);
-            renderer.DrawLine(line);
+            viewModel.renderer.DrawLine(line);
+            viewModel._points.Clear();
          }
 
          // Режим рисования круга
-         else if (viewModel._figureType == FigureType.Circle && _points.Count % 2 == 0)
+         else if (viewModel._figureType == FigureType.Circle && viewModel._points.Count % 2 == 0)
          {
-            //var center = _points[^2];
-            //var radiusPoint = _points[^1];
-            //var radius = Math.Sqrt(Math.Pow(radiusPoint.x - center.x, 2) + Math.Pow(radiusPoint.y - center.y, 2));
-            //var circle = new Ellipse
-            //{
-            //   Width = radius * 2,
-            //   Height = radius * 2,
-            //   Stroke = Brushes.Black,
-            //   StrokeThickness = 2
-            //};
-            //Canvas.SetLeft(circle, center.x - radius);
-            //Canvas.SetTop(circle, center.y - radius);
-            //_canvas.Children.Add(circle);
-            //_shapes.Add(circle);
-            var circle = new Circle(_points[^2], _points[^1]);
+            var circle = new Circle(viewModel._points[^2], viewModel._points[^1]);
             double rad = circle.rad;
-            renderer.DrawCircle(_points[^2], rad);
+            viewModel.renderer.DrawCircle(viewModel._points[^2], rad);
+            viewModel._points.Clear();
+         }
+      }
+
+     private void OnPointerMoved(object? sender, PointerEventArgs e)
+      {
+         if (viewModel._points.Count == 1)
+         {
+            Point start = viewModel._points[^1];
+            Avalonia.Point Aend = e.GetPosition(this);
+            Point end = new(Aend.X, Aend.Y);
+            if (viewModel._figureType == FigureType.Line)
+            {
+               Line line = new(start, end);
+               viewModel.renderer.DrawLine(line);
+               viewModel.tempFigure.Add(line);
+            }
+            if (viewModel._figureType == FigureType.Circle)
+            {
+               Circle circle = new(start, end);
+               viewModel.renderer.DrawCircle(circle);
+               viewModel.tempFigure.Add(circle);
+            }
+            while (viewModel.tempFigure.Count > 1) { viewModel.renderer.Erase(viewModel.tempFigure[0]); viewModel.tempFigure.RemoveAt(0); }
          }
       }
 
