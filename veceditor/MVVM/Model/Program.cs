@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.ReactiveUI;
 using System;
 using veceditor.MVVM.View;
 
@@ -18,6 +19,7 @@ namespace veceditor.MVVM.Model
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
+                .UseReactiveUI()
                 .LogToTrace();
     }
 }
