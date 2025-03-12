@@ -112,9 +112,15 @@ namespace veceditor.MVVM
                Stroke = Brushes.Black,
                StrokeThickness = 2
             };
-            Canvas.SetLeft(circle, Center.x - rad);
+         var clip = new RectangleGeometry
+         {
+            Rect = new Avalonia.Rect(0, 0, canvas.Width, canvas.Height)
+         };
+         circle.Clip = clip;
+         Canvas.SetLeft(circle, Center.x - rad);
             Canvas.SetTop(circle, Center.y - rad);
-            canvas.Children.Add(circle);
+         
+         canvas.Children.Add(circle);
       }
 
       public void Erase(IFigure figure)
