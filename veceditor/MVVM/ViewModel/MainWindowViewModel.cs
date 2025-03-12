@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Point = veceditor.MVVM.Model.Point;
 using veceditor.MVVM.Model;
 using Avalonia.Rendering;
+using System.Collections.ObjectModel;
 
 namespace veceditor.MVVM.ViewModel
 {
@@ -31,28 +32,35 @@ namespace veceditor.MVVM.ViewModel
          SelectFigure = ReactiveCommand.Create<FigureType>(Select);
          SelectFigure.ObserveOn(RxApp.MainThreadScheduler);
       }
+      public ObservableCollection<FigureType> FigureTypes { get; } = new()
+    {
+        FigureType.Point, FigureType.Line, FigureType.Circle, FigureType.Rectangle, FigureType.Triangle
+    };
+      public FigureType _SelectedFigure
+      {
+         get => _figureType;
+         set
+         {
+            if (_figureType != value)
+            {
+               this.RaiseAndSetIfChanged(ref _figureType, value);
+               Select(value); // Теперь вызываем Select после обновления
+            }
+         }
+      }
+
       void Select(FigureType type)
       {
          _points.Clear();
-         while(tempFigure.Count > 0)
+         while (tempFigure.Count > 0)
          {
-           renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0);
+            renderer?.Erase(tempFigure[0]); // Защита от `null`
+            tempFigure.RemoveAt(0);
          }
          SelText.Text = $"{type}";
-         switch (type)
-         {
-            case FigureType.Point:
-               _figureType = type;
-               break;
-            case FigureType.Line:
-               _figureType = type;
-               break;
-            case FigureType.Circle:
-               _figureType = type;
-               break;
-            default:
-               break;
-         }
+
+         _figureType = type; // Теперь свойство корректно обновляется
       }
+
    }
 }

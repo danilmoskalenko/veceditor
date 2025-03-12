@@ -1,50 +1,39 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:vm="using:veceditor.MVVM.ViewModel"
-		xmlns:local="clr-namespace:veceditor"
+        xmlns:vm="using:veceditor.MVVM.ViewModel"
+        xmlns:local="clr-namespace:veceditor"
         x:Class="veceditor.MainWindow"
-		x:DataType ="vm:MainWindowViewModel"
+        x:DataType="vm:MainWindowViewModel"
         Title="veceditor"
         Width="900" Height="500">
+    
     <Grid>
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />  
-        <ColumnDefinition Width="60" /> <!-- Фиксированная ширина панели с кнопками -->
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="*" />  <!-- Панель растягивается на всю высоту -->
-    </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>  <!-- Панель инструментов сверху -->
+            <RowDefinition Height="*"/>   <!-- Холст для рисования, заполняет оставшееся пространство -->
+        </Grid.RowDefinitions>
 
-    <!-- Холст для рисования -->
-    <Canvas x:Name="DrawingCanvas" Background="White" Grid.Column="0" />
-	<Design.DataContext>
-			<!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-	<vm:MainWindowViewModel />
-	</Design.DataContext>
-    <!-- Правая панель с кнопками -->
-    <Grid Grid.Column="1" Background="Gray">
-        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
-            <Button Width="40" Height="40" Command="{Binding SelectFigure}" 
-					CommandParameter="{x:Static local:FigureType.Point}">
-                <Image Source="avares://veceditor/Icons/icon.png"/>
-            </Button>
-			<Button Width="40" Height="40" Command="{Binding SelectFigure}"
-					CommandParameter="{x:Static local:FigureType.Line}">
-				<Image Source="avares://veceditor/Icons/icon.png"/>
-			</Button>
-			<Button Width="40" Height="40" Command="{Binding SelectFigure}"
-					CommandParameter="{x:Static local:FigureType.Circle}">
-				<Image Source="avares://veceditor/Icons/icon.png"/>
-			</Button>
-            <Button Width="40" Height="40">
-                <Image Source="avares://veceditor/Icons/icon.png"/>
-            </Button>
-            <Button Width="40" Height="40">
-                <Image Source="avares://veceditor/Icons/icon.png"/>
-            </Button>
-        </StackPanel>
+        <!-- Верхняя панель инструментов -->
+        <Grid Background="Gray" Grid.Row="0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
+                <!-- Выпадающее меню выбора фигуры -->
+                <ComboBox Width="120" 
+                    SelectedItem="{Binding _SelectedFigure}" 
+                    ItemsSource="{Binding FigureTypes}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="avares://veceditor/Icons/icon.png" Width="20" Height="20"/>
+                                <TextBlock Text="{Binding}" Margin="5,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- Холст для рисования -->
+        <Canvas x:Name="DrawingCanvas" Background="White" Grid.Row="1"/>
     </Grid>
-</Grid>
 
 </Window>

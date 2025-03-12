@@ -45,6 +45,7 @@ namespace veceditor
          _canvas = this.FindControl<Canvas>("DrawingCanvas");
          if (_canvas != null)
          {
+            _canvas.ClipToBounds = true;
             TextBlock();
             _logic = new Logic(_canvas);
             viewModel.renderer = new DrawingRenderer(_canvas);
@@ -110,8 +111,8 @@ namespace veceditor
          else if (viewModel._figureType == FigureType.Circle && viewModel._points.Count % 2 == 0)
          {
             var circle = new Circle(viewModel._points[^2], viewModel._points[^1]);
-            double rad = circle.rad;
-            viewModel.renderer.DrawCircle(viewModel._points[^2], rad);
+            //double rad = circle.rad;
+            viewModel.renderer.DrawCircle(circle);
             viewModel._points.Clear();
          }
       }
@@ -121,7 +122,9 @@ namespace veceditor
          if (viewModel._points.Count == 1)
          {
             Point start = viewModel._points[^1];
-            Avalonia.Point Aend = e.GetPosition(this);
+            Avalonia.Point Aend = e.GetPosition(_canvas);
+            if (_canvas == null) return;
+            if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
             if (viewModel._figureType == FigureType.Line)
             {
