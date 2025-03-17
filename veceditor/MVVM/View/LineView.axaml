@@ -1,0 +1,28 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:veceditor.MVVM.ViewModel"
+             x:Class="veceditor.MVVM.View.LineView"
+             x:DataType="vm:LineViewModel">
+	<!-- Все ваши элементы, включая привязку -->
+	<StackPanel Margin="10">
+		<TextBlock Text="Настройки Линии" FontWeight="Bold"/>
+
+		<TextBlock Text="Начальная точка (X1, Y1):"/>
+		<StackPanel Orientation="Horizontal">
+			<TextBox Width="50" Text="{Binding X1}"/>
+			<TextBox Width="50" Text="{Binding Y1}"/>
+		</StackPanel>
+
+		<TextBlock Text="Конечная точка (X2, Y2):"/>
+		<StackPanel Orientation="Horizontal">
+			<TextBox Width="50" Text="{Binding X2}"/>
+			<TextBox Width="50" Text="{Binding Y2}"/>
+		</StackPanel>
+
+		<TextBlock Text="Толщина линии:"/>
+		<TextBox Text="{Binding StrokeThickness}"/>
+
+		<TextBlock Text="Цвет линии:"/>
+		<TextBox Text="{Binding Color}"/>
+	</StackPanel>
+</UserControl>
