@@ -1,22 +1,25 @@
 ﻿using Avalonia;
+using Avalonia.ReactiveUI;
 using System;
 using veceditor.MVVM.View;
 
-namespace veceditor.MVVM.Model;
-
-internal class Program
+namespace veceditor.MVVM.Model
 {
-   // Initialization code. Don't use any Avalonia, third-party APIs or any
-   // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-   // yet and stuff might break.
-   [STAThread]
-   public static void Main(string[] args) => BuildAvaloniaApp()
-      .StartWithClassicDesktopLifetime(args);
+    internal class Program
+    {
+        // Initialization code. Don't use any Avalonia, third-party APIs or any
+        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+        // yet and stuff might break.
+        [STAThread]
+        public static void Main(string[] args) => BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
 
-   // Avalonia configuration, don't remove; also used by visual designer.
-   public static AppBuilder BuildAvaloniaApp()
-      => AppBuilder.Configure<App>()
-         .UsePlatformDetect()
-         .WithInterFont()
-         .LogToTrace();
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .UseReactiveUI()
+                .LogToTrace();
+    }
 }
