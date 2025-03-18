@@ -21,11 +21,12 @@ namespace veceditor
 {
    public enum FigureType
    {
+      None,
       Point,
+      Line,
       Circle,
-      Rectangle,
       Triangle,
-      Line
+      Rectangle
    }
    public partial class MainWindow : Window
    {
@@ -63,7 +64,7 @@ namespace veceditor
             Margin = new Thickness(0, 10, 10, 0),
             Foreground = Brushes.Red,
          };
-         SelText.Text = $"{viewModel._figureType}";
+         SelText.Text = $"{viewModel._SelectedFigure}";
          viewModel.SelText = SelText;
          _canvas.Children.Add(SelText); 
       }
@@ -80,7 +81,7 @@ namespace veceditor
          viewModel._points.Add(point);
 
          // Режим рисования точки
-         if (viewModel._figureType == FigureType.Point)
+         if (viewModel._SelectedFigure == FigureType.Point)
          {
             var ellipse = new Ellipse
             {
@@ -95,11 +96,11 @@ namespace veceditor
             viewModel._points.Clear();
 
             //Пример изменения цвета
-            if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
+            //if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
          }
 
          // Режим рисования линии
-         else if (viewModel._figureType == FigureType.Line && viewModel._points.Count % 2 == 0)
+         else if (viewModel._SelectedFigure == FigureType.Line && viewModel._points.Count % 2 == 0)
          {
             var line = new Line(viewModel._points[^2], viewModel._points[^1]);
             _logic.AddFigure(line);
@@ -108,7 +109,7 @@ namespace veceditor
          }
 
          // Режим рисования круга
-         else if (viewModel._figureType == FigureType.Circle && viewModel._points.Count % 2 == 0)
+         else if (viewModel._SelectedFigure == FigureType.Circle && viewModel._points.Count % 2 == 0)
          {
             var circle = new Circle(viewModel._points[^2], viewModel._points[^1]);
             //double rad = circle.rad;
@@ -126,13 +127,13 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            if (viewModel._figureType == FigureType.Line)
+            if (viewModel._SelectedFigure == FigureType.Line)
             {
                Line line = new(start, end);
                viewModel.renderer.DrawLine(line);
                viewModel.tempFigure.Add(line);
             }
-            if (viewModel._figureType == FigureType.Circle)
+            if (viewModel._SelectedFigure == FigureType.Circle)
             {
                Circle circle = new(start, end);
                viewModel.renderer.DrawCircle(circle);

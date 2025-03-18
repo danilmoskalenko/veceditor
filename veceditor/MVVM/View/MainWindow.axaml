@@ -2,38 +2,64 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:veceditor.MVVM.ViewModel"
         xmlns:local="clr-namespace:veceditor"
+		xmlns:view="clr-namespace:veceditor.MVVM.View"
+		
         x:Class="veceditor.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="veceditor"
         Width="900" Height="500">
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>  <!-- Панель инструментов сверху -->
-            <RowDefinition Height="*"/>   <!-- Холст для рисования, заполняет оставшееся пространство -->
-        </Grid.RowDefinitions>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/> <!-- Основное поле -->
+			<ColumnDefinition Width="300"/> <!-- Боковая панель -->
+		</Grid.ColumnDefinitions>
 
-        <!-- Верхняя панель инструментов -->
-        <Grid Background="Gray" Grid.Row="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
-                <!-- Выпадающее меню выбора фигуры -->
-                <ComboBox Width="120" 
-                    SelectedItem="{Binding _SelectedFigure}" 
+		<Grid.RowDefinitions>
+			<RowDefinition Height="60"/> <!-- Панель инструментов сверху -->
+			<RowDefinition Height="*"/> <!-- Холст для рисования, заполняет оставшееся пространство -->
+		</Grid.RowDefinitions>
+
+		<!-- Верхняя панель инструментов -->
+		<Grid Background="Gray" Grid.Row="0" Grid.ColumnSpan="2">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
+				<!-- Кнопка Вперёд (Ctrl+Z) -->
+				<Button Content="Вперёд" Command="{Binding ForwardCommand}" Margin="10,0,0,0"/>
+
+				<!-- Кнопка Назад (Ctrl+R) -->
+				<Button Content="Назад" Command="{Binding BackwardCommand}" Margin="5,0,20,0"/>
+
+				<!-- Выпадающее меню выбора фигуры -->
+				<ComboBox Width="120"
+                    SelectedItem="{Binding _SelectedFigure}"
                     ItemsSource="{Binding FigureTypes}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="avares://veceditor/Icons/icon.png" Width="20" Height="20"/>
-                                <TextBlock Text="{Binding}" Margin="5,0,0,0"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </StackPanel>
-        </Grid>
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Image Source="avares://veceditor/Icons/icon.png" Width="20" Height="20"/>
+								<TextBlock Text="{Binding}" Margin="5,0,0,0"/>
+							</StackPanel>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				
+				<!-- Кнопка Режим редактирования -->
+				<Button Content="Режим редактирования" Command="{Binding EditModeCommand}" Margin="5,0,0,0"/>
+			</StackPanel>
+		</Grid>
 
-        <!-- Холст для рисования -->
-        <Canvas x:Name="DrawingCanvas" Background="White" Grid.Row="1"/>
-    </Grid>
+		<!-- Холст для рисования -->
+		<Canvas x:Name="DrawingCanvas" Background="White" Grid.Row="1" Grid.Column="0"/>
+
+		<!-- Боковая панель настроек -->
+		<Border Background="LightGray" Grid.Row="1" Grid.Column="1" Padding="10">
+			<ContentControl Content="{Binding CurrentFigureSettings}">
+				<ContentControl.ContentTemplate>
+					<DataTemplate>
+						<view:LineView />
+					</DataTemplate>
+				</ContentControl.ContentTemplate>
+			</ContentControl>
+		</Border>
+	</Grid>
 
 </Window>
