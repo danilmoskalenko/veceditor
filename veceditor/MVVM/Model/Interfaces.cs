@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,13 +49,17 @@ namespace veceditor.MVVM.Model
         void Reflection(Point ax1, Point ax2);
         IEnumerable<IDrawableFigure> GetDrawFigures();
         bool IsClosed { get; }
-      string Name { get; set; }
-    }
+        string Name { get; set; }
+        void RemoveFigureFromCanvas(Canvas _canvas);
+   }
     public interface ILogic
     {
-        ObservableCollection<IFigure> Figures { get; }
-        void AddFigure(IFigure figure);
-        void RemoveFigure(IFigure figure);
-        void ClearFigures();
-    }
+      ObservableCollection<IFigure> Figures { get; }
+      void AddFigure(IFigure figure);
+      void RemoveFigure(IFigure figure);
+      void ClearFigures();
+      public ObservableCollection<IFigure> GetFigures();
+
+
+   }
 }
