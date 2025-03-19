@@ -15,7 +15,6 @@ using veceditor.MVVM.Model;
 using veceditor.MVVM.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
-using Point = veceditor.MVVM.Model.Point;
 using System.Threading.Tasks;
 
 namespace veceditor
@@ -50,6 +49,7 @@ namespace veceditor
             TextBlock();
             _logic = new Logic(_canvas);
             viewModel.renderer = new DrawingRenderer(_canvas);
+            viewModel.Logic = _logic;
          }
          PointerPressed += OnPointerPressed;
          PointerMoved += OnPointerMoved;
@@ -77,7 +77,7 @@ namespace veceditor
          {
             return;
          }
-         Point point = new Point(Apoint.X, Apoint.Y);
+         var point = new veceditor.MVVM.Model.Point(Apoint.X, Apoint.Y);
          viewModel._points.Add(point);
 
          // Режим рисования точки
@@ -112,8 +112,25 @@ namespace veceditor
          else if (viewModel._figureType == FigureType.Circle && viewModel._points.Count % 2 == 0)
          {
             var circle = new Circle(viewModel._points[^2], viewModel._points[^1]);
-            //double rad = circle.rad;
             viewModel.renderer.DrawCircle(circle);
+            viewModel._points.Clear();
+         }
+
+         // Режим рисования прямоугольника
+         else if (viewModel._figureType == FigureType.Rectangle && viewModel._points.Count % 2 == 0)
+         {
+            var rectangle = new veceditor.MVVM.Rectangle(viewModel._points[^2], viewModel._points[^1]);
+            _logic.AddFigure(rectangle);
+            viewModel.renderer.DrawRectangle(rectangle);
+            viewModel._points.Clear();
+         }
+
+         // Режим рисования треугольника
+         else if (viewModel._figureType == FigureType.Triangle && viewModel._points.Count == 3)
+         {
+            var triangle = new Triangle(viewModel._points[0], viewModel._points[1], viewModel._points[2]);
+            _logic.AddFigure(triangle);
+            viewModel.renderer.DrawTriangle(triangle);
             viewModel._points.Clear();
          }
       }
@@ -122,11 +139,11 @@ namespace veceditor
       {
          if (viewModel._points.Count == 1)
          {
-            Point start = viewModel._points[^1];
+            var start = viewModel._points[^1];
             Avalonia.Point Aend = e.GetPosition(_canvas);
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
-            Point end = new(Aend.X, Aend.Y);
+            var end = new veceditor.MVVM.Model.Point(Aend.X, Aend.Y);
             if (viewModel._figureType == FigureType.Line)
             {
                Line line = new(start, end);
@@ -139,6 +156,26 @@ namespace veceditor
                viewModel.renderer.DrawCircle(circle);
                viewModel.tempFigure.Add(circle);
             }
+            if (viewModel._figureType == FigureType.Rectangle)
+            {
+               veceditor.MVVM.Rectangle rectangle = new(start, end);
+               viewModel.renderer.DrawRectangle(rectangle);
+               viewModel.tempFigure.Add(rectangle);
+            }
+            while (viewModel.tempFigure.Count > 1) { viewModel.renderer.Erase(viewModel.tempFigure[0]); viewModel.tempFigure.RemoveAt(0); }
+         }
+         else if (viewModel._figureType == FigureType.Triangle && viewModel._points.Count == 2)
+         {
+            var start = viewModel._points[0];
+            var middle = viewModel._points[1];
+            Avalonia.Point Aend = e.GetPosition(_canvas);
+            if (_canvas == null) return;
+            if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
+            var end = new veceditor.MVVM.Model.Point(Aend.X, Aend.Y);
+            
+            Triangle triangle = new(start, middle, end);
+            viewModel.renderer.DrawTriangle(triangle);
+            viewModel.tempFigure.Add(triangle);
             while (viewModel.tempFigure.Count > 1) { viewModel.renderer.Erase(viewModel.tempFigure[0]); viewModel.tempFigure.RemoveAt(0); }
          }
       }
@@ -184,6 +221,47 @@ namespace veceditor
             // Restore visibility
             SelText.IsVisible = selTextWasVisible;
          }
+      }
+
+      private async void OnSaveStateClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         if (_canvas == null) return;
+
+         var saveFileDialog = new SaveFileDialog
+         {
+            Title = "Save State",
+            Filters = new List<FileDialogFilter>
+            {
+               new FileDialogFilter { Name = "JSON Files", Extensions = new List<string> { "json" } }
+            },
+            DefaultExtension = "json"
+         };
+
+         var filePath = await saveFileDialog.ShowAsync(this);
+         if (string.IsNullOrEmpty(filePath))
+            return;
+
+         await viewModel.SaveState(filePath);
+      }
+
+      private async void OnLoadStateClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         if (_canvas == null) return;
+
+         var openFileDialog = new OpenFileDialog
+         {
+            Title = "Load State",
+            Filters = new List<FileDialogFilter>
+            {
+               new FileDialogFilter { Name = "JSON Files", Extensions = new List<string> { "json" } }
+            }
+         };
+
+         var filePaths = await openFileDialog.ShowAsync(this);
+         if (filePaths == null || filePaths.Length == 0)
+            return;
+
+         await viewModel.LoadState(filePaths[0]);
       }
 
       public void ChangeColor(Shape shape, Brush newColor)

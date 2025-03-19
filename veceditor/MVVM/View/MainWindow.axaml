@@ -32,6 +32,12 @@
                 
                 <!-- Save PNG Button -->
                 <Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
+                
+                <!-- Save State Button -->
+                <Button x:Name="SaveStateButton" Content="Save State" Click="OnSaveStateClick" />
+                
+                <!-- Load State Button -->
+                <Button x:Name="LoadStateButton" Content="Load State" Click="OnLoadStateClick" />
             </StackPanel>
         </Grid>
 
