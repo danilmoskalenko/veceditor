@@ -52,14 +52,5 @@ namespace veceditor.MVVM.Model
         string Name { get; set; }
         void RemoveFigureFromCanvas(Canvas _canvas);
    }
-    public interface ILogic
-    {
-      ObservableCollection<IFigure> Figures { get; }
-      void AddFigure(IFigure figure);
-      void RemoveFigure(IFigure figure);
-      void ClearFigures();
-      public ObservableCollection<IFigure> GetFigures();
 
-
-   }
 }

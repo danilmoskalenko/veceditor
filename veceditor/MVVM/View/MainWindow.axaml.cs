@@ -32,7 +32,6 @@ namespace veceditor
    {
       private Canvas? _canvas;
       private List<Shape> _shapes = new();
-      private ILogic _logic;
       private MainWindowViewModel viewModel;
 
       //Имитация выбранной фигуры
@@ -48,7 +47,6 @@ namespace veceditor
          {
             _canvas.ClipToBounds = true;
             TextBlock();
-            _logic = new Logic(_canvas);
             viewModel.renderer = new DrawingRenderer(_canvas);
          }
          PointerPressed += OnPointerPressed;
@@ -103,7 +101,6 @@ namespace veceditor
          else if (viewModel._SelectedFigure == FigureType.Line && viewModel._points.Count % 2 == 0)
          {
             var line = new Line(viewModel._points[^2], viewModel._points[^1]);
-            _logic.AddFigure(line);
             viewModel.renderer.DrawLine(line);
             viewModel._points.Clear();
          }
