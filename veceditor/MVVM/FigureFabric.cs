@@ -62,6 +62,7 @@ namespace veceditor.MVVM
       public void Scale(Point Center, double rad) => throw new NotImplementedException();
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+
    }
 
    public class DrawingRenderer : IGraphicInterface
