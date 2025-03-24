@@ -264,6 +264,49 @@ namespace veceditor
          await viewModel.LoadState(filePaths[0]);
       }
 
+      private async void OnSaveSvgClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         if (_canvas == null) return;
+
+         var saveFileDialog = new SaveFileDialog
+         {
+            Title = "Сохранить как SVG",
+            Filters = new List<FileDialogFilter>
+            {
+               new FileDialogFilter { Name = "SVG Files", Extensions = new List<string> { "svg" } }
+            },
+            DefaultExtension = "svg"
+         };
+
+         var filePath = await saveFileDialog.ShowAsync(this);
+         if (string.IsNullOrEmpty(filePath))
+            return;
+
+         // Временно скрываем TextBlock с текущим режимом рисования
+         bool selTextWasVisible = SelText.IsVisible;
+         SelText.IsVisible = false;
+
+         try
+         {
+            var success = await SvgExporter.ExportToSvg(_canvas, filePath);
+            if (success)
+            {
+               // Сообщение об успехе
+               Console.WriteLine("SVG сохранен успешно!");
+            }
+            else
+            {
+               // Сообщение об ошибке
+               Console.WriteLine("Не удалось сохранить SVG.");
+            }
+         }
+         finally
+         {
+            // Восстанавливаем видимость
+            SelText.IsVisible = selTextWasVisible;
+         }
+      }
+
       public void ChangeColor(Shape shape, Brush newColor)
       {
          if (shape is Ellipse ellipse)

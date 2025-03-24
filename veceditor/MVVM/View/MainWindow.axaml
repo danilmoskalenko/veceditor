@@ -33,6 +33,9 @@
                 <!-- Save PNG Button -->
                 <Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
                 
+                <!-- Save SVG Button -->
+                <Button x:Name="SaveSvgButton" Content="Save as SVG" Click="OnSaveSvgClick" />
+                
                 <!-- Save State Button -->
                 <Button x:Name="SaveStateButton" Content="Save State" Click="OnSaveStateClick" />
                 
