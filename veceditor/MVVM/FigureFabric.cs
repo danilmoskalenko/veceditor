@@ -13,6 +13,16 @@ using veceditor.MVVM.Model;
 using Point = veceditor.MVVM.Model.Point;
 namespace veceditor.MVVM
 {
+   public class FigureFabric
+   {
+      void Create(Point start, Point end, FigureType type)
+      {
+         switch (type)
+         {
+            
+         }
+      }
+   }
    public class Line : IFigure
    {
       public Point start;
