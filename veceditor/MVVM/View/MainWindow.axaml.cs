@@ -110,41 +110,38 @@ namespace veceditor
          _points.Add(point);
 
          // Режим рисования точки
-         if (_selectedFigure == FigureType.Point)
+         switch (_selectedFigure)
          {
-            var ellipse = new Ellipse
-            {
-               Width = 6,
-               Height = 6,
-               Fill = Brushes.Black
-            };
-            Canvas.SetLeft(ellipse, point.x - 3);
-            Canvas.SetTop(ellipse, point.y - 3);
-            _canvas.Children.Add(ellipse);
-            _shapes.Add(ellipse);
-            _points.Clear();
+            case FigureType.Point:
+               var ellipse = new Ellipse
+               {
+                  Width = 6,
+                  Height = 6,
+                  Fill = Brushes.Black
+               };
+               Canvas.SetLeft(ellipse, point.x - 3);
+               Canvas.SetTop(ellipse, point.y - 3);
+               _canvas.Children.Add(ellipse);
+               _shapes.Add(ellipse);
+               _points.Clear();
+               break;
 
-            //Пример изменения цвета
-            //if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
-         }
+            case FigureType.Line:
+               if (_points.Count % 2 != 0) break;
+               var line = new Line(_points[^2], _points[^1]);
+               renderer.DrawLine(line);
+               viewModel.FigureCreate(line);
+               _points.Clear();
+               break;
 
-         // Режим рисования линии
-         else if (_selectedFigure == FigureType.Line && _points.Count % 2 == 0)
-         {
-            var line = new Line(_points[^2], _points[^1]);
-            renderer.DrawLine(line);
-            viewModel.FigureCreate(line);
-            _points.Clear();
-         }
-
-         // Режим рисования круга
-         else if (_selectedFigure == FigureType.Circle && _points.Count % 2 == 0)
-         {
-            var circle = new Circle(_points[^2], _points[^1]);
-            //double rad = circle.rad;
-            renderer.DrawCircle(circle);
-            viewModel.FigureCreate(circle);
-            _points.Clear();
+            case FigureType.Circle:
+               if (_points.Count % 2 != 0) break;
+               var circle = new Circle(_points[^2], _points[^1]);
+               //double rad = circle.rad;
+               renderer.DrawCircle(circle);
+               viewModel.FigureCreate(circle);
+               _points.Clear();
+               break;
          }
       }
 
@@ -157,22 +154,38 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            if (_selectedFigure == FigureType.Line)
+            switch(_selectedFigure)
             {
-               Line line = new(start, end);
-               renderer.DrawLine(line);
-               tempFigure.Add(line);
-            }
-            if (_selectedFigure == FigureType.Circle)
-            {
-               Circle circle = new(start, end);
-               renderer.DrawCircle(circle);
-               tempFigure.Add(circle);
+               case FigureType.Line:
+                  Line line = new(start, end);
+                  renderer.DrawLine(line);
+                  tempFigure.Add(line);
+                  line.figure.PointerPressed += (sender, e) =>
+                  {
+                     InteractFigure(line);
+                  };
+                  break;
+               case FigureType.Circle:
+                  Circle circle = new(start, end);
+                  renderer.DrawCircle(circle);
+                  tempFigure.Add(circle);
+                  circle.figure.PointerPressed += (sender, e) =>
+                  {
+                     InteractFigure(circle);
+                  };
+                  break;
             }
             while (tempFigure.Count > 1) { renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0); }
          }
       }
-     
+
+      private void InteractFigure(IFigure figure)
+      {
+         // Убираем выделение (если есть)
+         viewModel.CurFigure = figure;
+         // Работа с выделением
+      }
+
       private async void OnSavePngClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
       {
          if (_canvas == null) return;
