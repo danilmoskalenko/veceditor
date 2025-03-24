@@ -22,7 +22,7 @@ namespace veceditor
 {
    public enum FigureType
    {
-      None,
+      Edit,
       Point,
       Line,
       Circle,
@@ -98,6 +98,8 @@ namespace veceditor
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
          if (_canvas == null) return;
+
+         while (tempFigure.Count > 0) { renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0); }
 
          var Apoint = e.GetPosition(_canvas);
          if (Apoint.X < 0 || Apoint.Y < 0 || Apoint.X > _canvas.Bounds.Width || Apoint.Y > _canvas.Bounds.Height)
@@ -227,6 +229,17 @@ namespace veceditor
          if (e.Key == Key.D)
          {
             viewModel.DeleteFigure();
+         }
+         if (e.Key == Key.C)
+         {
+            for (int i = 0; i < _canvas.Children.Count; i++)
+            {
+               if (!(_canvas.Children[i] is TextBlock))
+               {
+                  _canvas.Children.Remove(_canvas.Children[i]);
+                  i--;
+               }
+            }
          }
       }
    }
