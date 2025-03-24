@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace veceditor.MVVM.Model
         IEnumerable<IDrawableFigure> GetDrawFigures();
         bool IsClosed { get; }
         string Name { get; set; }
-        void RemoveFigureFromCanvas();
+        
    }
 
 }

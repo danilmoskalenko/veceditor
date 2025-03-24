@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -54,13 +55,18 @@ namespace veceditor
          }
          _canvas.PointerPressed += OnPointerPressed;
          _canvas.PointerMoved += OnPointerMoved;
+         this.KeyDown += OnKeyDown;
+         Subscribes();
+      
+      }
+      void Subscribes()
+      {
          viewModel.WhenAnyValue(x => x._SelectedFigure)
          .Subscribe(_ => SelectGUI());
-      
+         viewModel.FigureRemoved += DeleteFigure;
       }
       void SelectGUI()
       {
-         Console.WriteLine("SelectGUI called");
          _points.Clear();
          while (tempFigure.Count > 0)
          {
@@ -68,6 +74,10 @@ namespace veceditor
             tempFigure.RemoveAt(0);
          }
          SelText.Text = $"{viewModel._selectedFigure}";
+      }
+      void DeleteFigure(object sender, IFigure figure)
+      {
+         renderer.Erase(figure);
       }
       void TextBlock()
       {
@@ -118,6 +128,7 @@ namespace veceditor
          {
             var line = new Line(_points[^2], _points[^1]);
             renderer.DrawLine(line);
+            viewModel.FigureCreate(line);
             _points.Clear();
          }
 
@@ -127,6 +138,7 @@ namespace veceditor
             var circle = new Circle(_points[^2], _points[^1]);
             //double rad = circle.rad;
             renderer.DrawCircle(circle);
+            viewModel.FigureCreate(circle);
             _points.Clear();
          }
       }
@@ -162,6 +174,14 @@ namespace veceditor
             ellipse.Fill = newColor;
          else if (shape is Path path)
             path.Stroke = newColor;
+      }
+
+      public void OnKeyDown(object sender, KeyEventArgs e)
+      {
+         if (e.Key == Key.D)
+         {
+            viewModel.DeleteFigure();
+         }
       }
    }
 }
