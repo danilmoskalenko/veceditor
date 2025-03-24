@@ -43,7 +43,7 @@ namespace veceditor.MVVM.ViewModel
       public ObservableCollection<IFigure> Figures { get; set;}
 
       // Выбранная фигура (в Меню выбора)
-      public FigureType _selectedFigure;
+      private FigureType _selectedFigure;
       public FigureType _SelectedFigure
       {
          get => _selectedFigure;

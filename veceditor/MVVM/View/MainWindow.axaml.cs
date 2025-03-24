@@ -31,6 +31,7 @@ namespace veceditor
    }
    public partial class MainWindow : Window
    {
+      public FigureType _selectedFigure;
       public TextBlock SelText;
       private Canvas? _canvas;
       private List<Shape> _shapes = new();
@@ -39,7 +40,7 @@ namespace veceditor
       public List<IFigure> tempFigure = new();
       public DrawingRenderer? renderer;
       //Имитация выбранной фигуры
-
+      public FigureFabric CreatorFigures;
       public MainWindow(MainWindowViewModel viewModel)
       {
          
@@ -56,16 +57,17 @@ namespace veceditor
          _canvas.PointerPressed += OnPointerPressed;
          _canvas.PointerMoved += OnPointerMoved;
          this.KeyDown += OnKeyDown;
+         _selectedFigure = FigureType.Line;
          Subscribes();
       
       }
       void Subscribes()
       {
          viewModel.WhenAnyValue(x => x._SelectedFigure)
-         .Subscribe(_ => SelectGUI());
+         .Subscribe(type => SelectGUI(type));
          viewModel.FigureRemoved += DeleteFigure;
       }
-      void SelectGUI()
+      void SelectGUI(FigureType type)
       {
          _points.Clear();
          while (tempFigure.Count > 0)
@@ -73,7 +75,8 @@ namespace veceditor
             renderer?.Erase(tempFigure[0]);
             tempFigure.RemoveAt(0);
          }
-         SelText.Text = $"{viewModel._selectedFigure}";
+         _selectedFigure = type;
+         SelText.Text = $"{_selectedFigure}";
       }
       void DeleteFigure(object sender, IFigure figure)
       {
@@ -107,7 +110,7 @@ namespace veceditor
          _points.Add(point);
 
          // Режим рисования точки
-         if (viewModel._SelectedFigure == FigureType.Point)
+         if (_selectedFigure == FigureType.Point)
          {
             var ellipse = new Ellipse
             {
@@ -126,7 +129,7 @@ namespace veceditor
          }
 
          // Режим рисования линии
-         else if (viewModel._SelectedFigure == FigureType.Line && _points.Count % 2 == 0)
+         else if (_selectedFigure == FigureType.Line && _points.Count % 2 == 0)
          {
             var line = new Line(_points[^2], _points[^1]);
             renderer.DrawLine(line);
@@ -135,7 +138,7 @@ namespace veceditor
          }
 
          // Режим рисования круга
-         else if (viewModel._SelectedFigure == FigureType.Circle && _points.Count % 2 == 0)
+         else if (_selectedFigure == FigureType.Circle && _points.Count % 2 == 0)
          {
             var circle = new Circle(_points[^2], _points[^1]);
             //double rad = circle.rad;
@@ -154,13 +157,13 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            if (viewModel._SelectedFigure == FigureType.Line)
+            if (_selectedFigure == FigureType.Line)
             {
                Line line = new(start, end);
                renderer.DrawLine(line);
                tempFigure.Add(line);
             }
-            if (viewModel._SelectedFigure == FigureType.Circle)
+            if (_selectedFigure == FigureType.Circle)
             {
                Circle circle = new(start, end);
                renderer.DrawCircle(circle);
