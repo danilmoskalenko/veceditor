@@ -37,7 +37,7 @@ namespace veceditor.MVVM.ViewModel
       // Коллекция типов фигур
       public ObservableCollection<FigureType> FigureTypes { get; } = new()
         {
-            FigureType.None, FigureType.Point, FigureType.Line, FigureType.Circle, FigureType.Rectangle, FigureType.Triangle
+            FigureType.Edit, FigureType.Point, FigureType.Line, FigureType.Circle, FigureType.Rectangle, FigureType.Triangle
         };
       
       public ObservableCollection<IFigure> Figures { get; set;}
@@ -108,8 +108,8 @@ namespace veceditor.MVVM.ViewModel
       }
       void Select(FigureType type)
       {
-         if (type == FigureType.None && !_isEditMode ||
-             type != FigureType.None && _isEditMode)
+         if (type == FigureType.Edit && !_isEditMode ||
+             type != FigureType.Edit && _isEditMode)
          {
             ToggleEditMode();
          }
@@ -150,7 +150,7 @@ namespace veceditor.MVVM.ViewModel
          _isEditMode = !_isEditMode;
          if (_isEditMode)
          {
-            _SelectedFigure = FigureType.None;
+            _SelectedFigure = FigureType.Edit;
          }
          else
          {
