@@ -36,9 +36,9 @@ namespace veceditor.MVVM
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
 
-      public void RemoveFigureFromCanvas(Canvas _canvas)
+      public void RemoveFigureFromCanvas()
       {
-         _canvas.Children.Remove(figure);
+         
       }
    }
 
@@ -68,9 +68,9 @@ namespace veceditor.MVVM
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
 
-      public void RemoveFigureFromCanvas(Canvas _canvas)
+      public void RemoveFigureFromCanvas()
       {
-         _canvas.Children.Remove(figure);
+         
       }
    }
 

@@ -17,10 +17,6 @@ namespace veceditor.MVVM.ViewModel
    public partial class MainWindowViewModel : ViewModelBase
    {
       public ReactiveCommand<FigureType, Unit> SelectFigure { get; }
-      public TextBlock SelText;
-      public List<Point> _points = new();
-      public List<IFigure> tempFigure = new();
-      public DrawingRenderer? renderer;
 
       private bool _isEditMode;
       public ICommand ForwardCommand { get; }
@@ -34,7 +30,7 @@ namespace veceditor.MVVM.ViewModel
         };
 
       // Выбранная фигура
-      private FigureType _selectedFigure;
+      public FigureType _selectedFigure;
       public FigureType _SelectedFigure
       {
          get => _selectedFigure;
@@ -59,13 +55,19 @@ namespace veceditor.MVVM.ViewModel
       public MainWindowViewModel()
       {
          _selectedFigure = FigureType.Line;
-         SelText = new TextBlock();
          SelectFigure = ReactiveCommand.Create<FigureType>(Select);
-         SelectFigure.ObserveOn(RxApp.MainThreadScheduler);
 
          ForwardCommand = ReactiveCommand.Create(ForwardAction);
          BackwardCommand = ReactiveCommand.Create(BackwardAction);
          EditModeCommand = ReactiveCommand.Create(ToggleEditMode);
+
+         Subscribes();
+         
+      }
+      private void Subscribes()
+      {
+         this.WhenAnyValue(x => x._SelectedFigure)
+            .Subscribe(type => Select(type));
       }
 
       void Select(FigureType type)
@@ -75,17 +77,7 @@ namespace veceditor.MVVM.ViewModel
          {
             ToggleEditMode();
          }
-
-         _points.Clear();
-         while (tempFigure.Count > 0)
-         {
-            renderer?.Erase(tempFigure[0]);
-            tempFigure.RemoveAt(0);
-         }
-
-         SelText.Text = $"{type}";
          _selectedFigure = type;
-
          // Выбор соответствующих параметров
          switch (type)
          {
@@ -128,6 +120,11 @@ namespace veceditor.MVVM.ViewModel
          {
             _SelectedFigure = FigureType.Point;
          }
+      }
+
+      public FigureType GetTypeSelectedFigure()
+      {
+         return _selectedFigure;
       }
    }
 }

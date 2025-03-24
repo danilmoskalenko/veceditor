@@ -50,7 +50,7 @@ namespace veceditor.MVVM.Model
         IEnumerable<IDrawableFigure> GetDrawFigures();
         bool IsClosed { get; }
         string Name { get; set; }
-        void RemoveFigureFromCanvas(Canvas _canvas);
+        void RemoveFigureFromCanvas();
    }
 
 }
