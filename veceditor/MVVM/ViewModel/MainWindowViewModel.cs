@@ -11,17 +11,24 @@ using veceditor.MVVM.Model;
 using Avalonia.Rendering;
 using System.Collections.ObjectModel;
 using vecedidor.MVVM.ViewModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace veceditor.MVVM.ViewModel
 {
    public partial class MainWindowViewModel : ViewModelBase
    {
+      int id_changes = -1;
+      // 0 - добавление фигуры
+      // 1 - удаление фигуры
       public ReactiveCommand<FigureType, Unit> SelectFigure { get; }
-      public TextBlock SelText;
-      public List<Point> _points = new();
-      public List<IFigure> tempFigure = new();
-      public DrawingRenderer? renderer;
-
+      //Текущая фигура 
+      private IFigure curFigure;
+      public IFigure CurFigure
+    {
+        get => curFigure;
+        set => this.RaiseAndSetIfChanged(ref curFigure, value);
+    }
       private bool _isEditMode;
       public ICommand ForwardCommand { get; }
       public ICommand BackwardCommand { get; }
@@ -32,9 +39,11 @@ namespace veceditor.MVVM.ViewModel
         {
             FigureType.None, FigureType.Point, FigureType.Line, FigureType.Circle, FigureType.Rectangle, FigureType.Triangle
         };
+      
+      public ObservableCollection<IFigure> Figures { get; set;}
 
-      // Выбранная фигура
-      private FigureType _selectedFigure;
+      // Выбранная фигура (в Меню выбора)
+      public FigureType _selectedFigure;
       public FigureType _SelectedFigure
       {
          get => _selectedFigure;
@@ -48,7 +57,7 @@ namespace veceditor.MVVM.ViewModel
          }
       }
 
-      // Текущая фигура и её параметры
+      // Текущая фигура и её параметры (в меню выбора)
       private object? _currentFigureSettings;
       public object? CurrentFigureSettings
       {
@@ -59,15 +68,44 @@ namespace veceditor.MVVM.ViewModel
       public MainWindowViewModel()
       {
          _selectedFigure = FigureType.Line;
-         SelText = new TextBlock();
          SelectFigure = ReactiveCommand.Create<FigureType>(Select);
-         SelectFigure.ObserveOn(RxApp.MainThreadScheduler);
 
          ForwardCommand = ReactiveCommand.Create(ForwardAction);
          BackwardCommand = ReactiveCommand.Create(BackwardAction);
          EditModeCommand = ReactiveCommand.Create(ToggleEditMode);
-      }
 
+         Figures = new ObservableCollection<IFigure>();
+         //Инициализация всех подписок
+         Subscribes();
+         
+      }
+      private void Subscribes()
+      {
+         this.WhenAnyValue(x => x._SelectedFigure)
+            .Subscribe(type => Select(type));
+         this.WhenAnyValue(x => x.Figures.Count)
+            .Subscribe(_ => UpdateCurFigures());
+
+         Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                 h => Figures.CollectionChanged += h,
+                h => Figures.CollectionChanged -= h
+             )
+             .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Remove) // Фильтруем только удаление
+             .Select(e => e.EventArgs.OldItems[0] as IFigure)
+             .Subscribe(figure => 
+            {
+               FigureRemoved?.Invoke(this, figure);
+               UpdateCurFigures();
+            });
+
+           
+      }
+      public event EventHandler<IFigure> FigureRemoved;
+       //При удалении/добавлении фигур указатель на текущую фигуру смещается на последний элемент
+      public void UpdateCurFigures()
+      {
+         curFigure = Figures.LastOrDefault();
+      }
       void Select(FigureType type)
       {
          if (type == FigureType.None && !_isEditMode ||
@@ -75,17 +113,7 @@ namespace veceditor.MVVM.ViewModel
          {
             ToggleEditMode();
          }
-
-         _points.Clear();
-         while (tempFigure.Count > 0)
-         {
-            renderer?.Erase(tempFigure[0]);
-            tempFigure.RemoveAt(0);
-         }
-
-         SelText.Text = $"{type}";
          _selectedFigure = type;
-
          // Выбор соответствующих параметров
          switch (type)
          {
@@ -128,6 +156,16 @@ namespace veceditor.MVVM.ViewModel
          {
             _SelectedFigure = FigureType.Point;
          }
+      }
+      //Добавление фигур
+      public void FigureCreate(IFigure figure)
+      {
+         Figures.Add(figure);
+      }
+      //Удаление фигур
+      public void DeleteFigure()
+      {
+         Figures.Remove(curFigure);
       }
    }
 }

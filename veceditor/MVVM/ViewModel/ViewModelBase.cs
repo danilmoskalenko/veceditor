@@ -15,7 +15,6 @@ namespace vecedidor.MVVM.ViewModel
       public string ModelName { get=>modelName; set=>this.RaiseAndSetIfChanged(ref modelName,value); }
 
       [Reactive] public string ModelName2 { get; set; }
-      public ILogic _logic;
       [Reactive] public IFigure? SelectedFigure { get; set; }
       public SourceCache<IFigure, string> Figures { get; } = new(figure => figure.Name);
 
