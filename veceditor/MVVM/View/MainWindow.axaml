@@ -44,6 +44,9 @@
 				
 				<!-- Кнопка Режим редактирования -->
 				<Button Content="Режим редактирования" Command="{Binding EditModeCommand}" Margin="5,0,0,0"/>
+				
+				<!-- Save PNG Button -->
+				<Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
 			</StackPanel>
 		</Grid>
 

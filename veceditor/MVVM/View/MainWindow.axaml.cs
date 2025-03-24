@@ -142,6 +142,49 @@ namespace veceditor
             while (viewModel.tempFigure.Count > 1) { viewModel.renderer.Erase(viewModel.tempFigure[0]); viewModel.tempFigure.RemoveAt(0); }
          }
       }
+     
+      private async void OnSavePngClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         if (_canvas == null) return;
+
+         var saveFileDialog = new SaveFileDialog
+         {
+            Title = "Save as PNG",
+            Filters = new List<FileDialogFilter>
+            {
+               new FileDialogFilter { Name = "PNG Files", Extensions = new List<string> { "png" } }
+            },
+            DefaultExtension = "png"
+         };
+
+         var filePath = await saveFileDialog.ShowAsync(this);
+         if (string.IsNullOrEmpty(filePath))
+            return;
+
+         // Hide the SelText temporarily for the export
+         bool selTextWasVisible = SelText.IsVisible;
+         SelText.IsVisible = false;
+
+         try
+         {
+            var success = await PngExporter.ExportToPng(_canvas, filePath);
+            if (success)
+            {
+               // Success message
+               Console.WriteLine("Image saved successfully!");
+            }
+            else
+            {
+               // Error message
+               Console.WriteLine("Failed to save the image.");
+            }
+         }
+         finally
+         {
+            // Restore visibility
+            SelText.IsVisible = selTextWasVisible;
+         }
+      }
 
       public void ChangeColor(Shape shape, Brush newColor)
       {
