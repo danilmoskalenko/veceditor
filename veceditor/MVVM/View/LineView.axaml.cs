@@ -28,11 +28,11 @@ namespace veceditor.MVVM.View
          viewModel.notReDraw = true;
          if (figure is Circle circle)
          {
-            viewModel.X1 = circle.center.x;
-            viewModel.Y1 = circle.center.y;
+            viewModel.X1 = circle.Center.x;
+            viewModel.Y1 = circle.Center.y;
 
-            viewModel.X2 = circle.radPoint.x;
-            viewModel.Y2 = circle.radPoint.y;
+            viewModel.X2 = circle.RadPoint.x;
+            viewModel.Y2 = circle.RadPoint.y;
 
             viewModel.StrokeThickness = circle.strokeThickness;
 
@@ -58,11 +58,11 @@ namespace veceditor.MVVM.View
          }
          else if (figure is Rectangle rectangle)
          {
-            viewModel.X1 = rectangle.topLeft.x;
-            viewModel.Y1 = rectangle.topLeft.y;
+            viewModel.X1 = rectangle.TopLeft.x;
+            viewModel.Y1 = rectangle.TopLeft.y;
 
-            viewModel.X2 = rectangle.bottomRight.x;
-            viewModel.Y2 = rectangle.bottomRight.y;
+            viewModel.X2 = rectangle.BottomRight.x;
+            viewModel.Y2 = rectangle.BottomRight.y;
 
             viewModel.StrokeThickness = rectangle.strokeThickness;
 
@@ -73,11 +73,11 @@ namespace veceditor.MVVM.View
          }
          else if (figure is Triangle triangle)
          {
-            viewModel.X1 = triangle.topPoint.x;
-            viewModel.Y1 = triangle.topPoint.y;
+            viewModel.X1 = triangle.TopPoint.x;
+            viewModel.Y1 = triangle.TopPoint.y;
 
-            viewModel.X2 = triangle.bottomPoint1.x;
-            viewModel.Y2 = triangle.bottomPoint1.y;
+            viewModel.X2 = triangle.BottomPoint1.x;
+            viewModel.Y2 = triangle.BottomPoint1.y;
 
             viewModel.StrokeThickness = triangle.strokeThickness;
 

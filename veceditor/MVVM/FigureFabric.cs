@@ -1,4 +1,4 @@
-﻿using Avalonia;
+﻿﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -21,6 +21,27 @@ namespace veceditor.MVVM
 {
    public class FigureFabric
    {
+      public IFigure CreateFromJson(Point pt1, Point pt2, FigureType type,
+      Avalonia.Media.Color color, double _strokeThickness)
+      {
+         IFigure fig_obj = null;
+         switch (type)
+         {
+            case FigureType.Line:
+               fig_obj = new Line(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Circle:
+               fig_obj = new Circle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Triangle:
+               fig_obj = new Triangle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Rectangle:
+               fig_obj = new Rectangle(pt1, pt2, color, _strokeThickness);
+               break;
+         }
+         return fig_obj;
+      }
       public IFigure Create(Point pt1, Point pt2, FigureType type)
       {
          IFigure fig_obj = null;
@@ -63,6 +84,13 @@ namespace veceditor.MVVM
          this.end = end;
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
+      public Line(Point start, Point end, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.start = start;
+         this.end = end;
+         ColorFigure = color;
+         this._strokeThickness = strokeThickness;
+      }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
@@ -87,8 +115,8 @@ namespace veceditor.MVVM
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point center;
-      public Point radPoint;
+      private Point center;
+      private Point radPoint;
       public bool isPoint;
 
       public Point Center
@@ -110,6 +138,16 @@ namespace veceditor.MVVM
       }
       public double rad;
       public Ellipse? figure;
+      public Circle(Point center, Point radPoint, Avalonia.Media.Color color, double strokeThickness)
+      {
+         this.center = center;
+         this.radPoint = radPoint;
+         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
+         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+      }
 
       public Circle(Point center, Point radPoint, bool isPoint)
       {
@@ -124,7 +162,7 @@ namespace veceditor.MVVM
 
       private void UpdateRadius()
       {
-           this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
       }
 
       
@@ -146,14 +184,26 @@ namespace veceditor.MVVM
 
    }
 
-   public class Triangle : IFigure
+   public class Triangle : ReactiveObject, IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point topPoint;
-      public Point bottomPoint1;
+      private Point topPoint;
+      private Point bottomPoint1;
       public Point bottomPoint2;
+
+      public Point TopPoint
+      {
+          get => topPoint;
+          set => this.RaiseAndSetIfChanged(ref topPoint, value);              
+      }
+
+      public Point BottomPoint1
+      {
+          get => bottomPoint1;
+          set => this.RaiseAndSetIfChanged(ref bottomPoint1, value);              
+      }
       internal Polygon? figure;
 
       //public Ellipse? figure;
@@ -166,8 +216,19 @@ namespace veceditor.MVVM
          CalculateBottomPoint2();
 
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         this.WhenAnyValue(x => x.topPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.bottomPoint1).Subscribe(_ => CalculateBottomPoint2());
       }
-
+       public Triangle(Point topPoint, Point bottomPoint1, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.topPoint = topPoint;
+         this.bottomPoint1 = bottomPoint1;
+         CalculateBottomPoint2();
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.topPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.bottomPoint1).Subscribe(_ => CalculateBottomPoint2());
+      }
       // Метод для вычисления второй боковой точки
       public void CalculateBottomPoint2()
       {
@@ -211,8 +272,8 @@ namespace veceditor.MVVM
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point topLeft;
-      public Point bottomRight;
+      private Point topLeft;
+      private Point bottomRight;
       internal Path? figure;
 
       public Point TopLeft
@@ -239,7 +300,16 @@ namespace veceditor.MVVM
          
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);  // Можно заменить на любой цвет
       }
-
+      public Rectangle(Point point1, Point point2, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.topLeft = point1;
+         this.bottomRight = point2;
+         UpdatePoint();
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
+         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
+      }
       public void UpdatePoint()
       {
          Point point1 = topLeft;
@@ -297,8 +367,8 @@ namespace veceditor.MVVM
             Fill = new SolidColorBrush(circleObj.ColorFigure)
          };
 
-         Canvas.SetLeft(circle, circleObj.center.x - 3);
-         Canvas.SetTop(circle, circleObj.center.y - 3);
+         Canvas.SetLeft(circle, circleObj.Center.x - 3);
+         Canvas.SetTop(circle, circleObj.Center.y - 3);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
@@ -314,8 +384,8 @@ namespace veceditor.MVVM
             //Fill = Brushes.Transparent
          };
 
-         Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
-         Canvas.SetTop(circle, circleObj.center.y - circleObj.rad);
+         Canvas.SetLeft(circle, circleObj.Center.x - circleObj.rad);
+         Canvas.SetTop(circle, circleObj.Center.y - circleObj.rad);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
@@ -362,8 +432,8 @@ namespace veceditor.MVVM
          {
             Points = new AvaloniaList<Avalonia.Point>
         {
-            new Avalonia.Point(triangle.topPoint.x, triangle.topPoint.y),
-            new Avalonia.Point(triangle.bottomPoint1.x, triangle.bottomPoint1.y),
+            new Avalonia.Point(triangle.TopPoint.x, triangle.TopPoint.y),
+            new Avalonia.Point(triangle.BottomPoint1.x, triangle.BottomPoint1.y),
             new Avalonia.Point(triangle.bottomPoint2.x, triangle.bottomPoint2.y)
         },
             Stroke = new SolidColorBrush(triangle.ColorFigure),
@@ -412,3 +482,7 @@ namespace veceditor.MVVM
       }
    }
 }
+
+   
+  
+   

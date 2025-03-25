@@ -93,6 +93,7 @@ namespace veceditor
          SelText.Text = $"{viewModel._SelectedFigure}";
          _canvas.Children.Add(SelText); 
       }
+      
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
          if (_canvas == null) return;
@@ -125,7 +126,9 @@ namespace veceditor
 
 
             case FigureType.Line:
+
                if (_points.Count % 2 != 0) break;
+
                var line = viewModel.FigureCreate(_points[^2], _points[^1]) as Line;
                renderer.DrawLine(line);
                _points.Clear();
@@ -340,13 +343,13 @@ namespace veceditor
          }
          else if(figure is Circle circle)
          {
-            Circle point = new(circle.center, new Point(0, 0), true)
+            Circle point = new(circle.Center, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(circle.radPoint, new Point(0, 0), true)
+            point = new(circle.RadPoint, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
@@ -355,13 +358,13 @@ namespace veceditor
          }
          else if (figure is Rectangle rectangle)
          {
-            Circle point = new(rectangle.topLeft, new Point(0, 0), true)
+            Circle point = new(rectangle.TopLeft, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(rectangle.bottomRight, new Point(0, 0), true)
+            point = new(rectangle.BottomRight, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
@@ -370,13 +373,13 @@ namespace veceditor
          }
          else if (figure is Triangle triangle)
          {
-            Circle point = new(triangle.topPoint, new Point(0, 0), true)
+            Circle point = new(triangle.TopPoint, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(triangle.bottomPoint1, new Point(0, 0), true)
+            point = new(triangle.BottomPoint1, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
