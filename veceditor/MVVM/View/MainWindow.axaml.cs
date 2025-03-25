@@ -130,9 +130,10 @@ namespace veceditor
                _points.Clear();
                break;
 
+
             case FigureType.Line:
                if (_points.Count % 2 != 0) break;
-               var line = new Line(_points[^2], _points[^1]);
+               var line = (Line)viewModel.FigureCreate(_points[^2], _points[^1]);
                renderer.DrawLine(line);
                _points.Clear();
                line.figure.PointerPressed += (sender, e) =>
@@ -146,7 +147,7 @@ namespace veceditor
 
             case FigureType.Circle:
                if (_points.Count % 2 != 0) break;
-               var circle = new Circle(_points[^2], _points[^1]);
+               var circle = (Circle)viewModel.FigureCreate(_points[^2], _points[^1]);
                //double rad = circle.rad;
                renderer.DrawCircle(circle);
                _points.Clear();
