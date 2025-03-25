@@ -1,4 +1,7 @@
-﻿using ReactiveUI;
+﻿using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using ReactiveUI;
 using System;
 using veceditor.MVVM.Model;
 
@@ -165,6 +168,28 @@ namespace veceditor.MVVM.ViewModel
             line.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
 
             mw.ReDraw(line);
+         }
+         else if (currentFigure is Rectangle rectangle)
+         {
+            rectangle.topLeft = new Point(X1, Y1);
+            rectangle.bottomRight = new Point(X2, Y2);
+            rectangle.UpdatePoint();
+
+            rectangle.strokeThickness = StrokeThickness;
+            rectangle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
+
+            mw.ReDraw(rectangle);
+         }
+         else if (currentFigure is Triangle triangle)
+         {
+            triangle.topPoint = new Point(X1, Y1);
+            triangle.bottomPoint1 = new Point(X2, Y2);
+            triangle.CalculateBottomPoint2();
+
+            triangle.strokeThickness = StrokeThickness;
+            triangle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
+
+            mw.ReDraw(triangle);
          }
       }
    }

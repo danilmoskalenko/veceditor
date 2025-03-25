@@ -3,23 +3,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Threading;
-using DynamicData;
-using DynamicData.Binding;
 using ReactiveUI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reactive.Linq;
-using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
 using veceditor.MVVM.View;
 using veceditor.MVVM.ViewModel;
-using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
 using Point = veceditor.MVVM.Model.Point;
+using Rectangle = veceditor.MVVM.Rectangle;
 
 namespace veceditor
 {
@@ -159,6 +153,32 @@ namespace veceditor
                InteractFigure(circle, true);
                viewModel.Figures.Add(circle);
                break;
+            case FigureType.Rectangle:
+               if (_points.Count % 2 != 0) break;
+               var rectangle = viewModel.FigureCreate(_points[^2], _points[^1]) as Rectangle;
+               renderer.DrawRectangle(rectangle);
+               _points.Clear();
+               rectangle.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(rectangle, false);
+               };
+
+               InteractFigure(rectangle, true);
+               viewModel.Figures.Add(rectangle);
+               break;
+            case FigureType.Triangle:
+               if (_points.Count % 2 != 0) break;
+               var triangle = viewModel.FigureCreate(_points[^2], _points[^1]) as Triangle;
+               renderer.DrawTriangle(triangle);
+               _points.Clear();
+               triangle.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(triangle, false);
+               };
+
+               InteractFigure(triangle, true);
+               viewModel.Figures.Add(triangle);
+               break;
          }
       }
 
@@ -182,6 +202,16 @@ namespace veceditor
                   Circle circle = new(start, end);
                   renderer.DrawCircle(circle);
                   tempFigure.Add(circle);
+                  break;
+               case FigureType.Rectangle:
+                  Rectangle rectangle = new(start, end);
+                  renderer.DrawRectangle(rectangle);
+                  tempFigure.Add(rectangle);
+                  break;
+               case FigureType.Triangle:
+                  Triangle triangle = new(start, end);
+                  renderer.DrawTriangle(triangle);
+                  tempFigure.Add(triangle);
                   break;
             }
             while (tempFigure.Count > 1) { renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0); }
@@ -214,6 +244,28 @@ namespace veceditor
                InteractFigure(circle, false);
             };
             if (figure.isSelected) { SelectFigure(circle); }
+         }
+         else if (figure is Rectangle)
+         {
+            var rectangle = figure as Rectangle;
+            renderer.DrawRectangle(rectangle);
+
+            rectangle.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(rectangle, false);
+            };
+            if (figure.isSelected) { SelectFigure(rectangle); }
+         }
+         else if (figure is Triangle)
+         {
+            var triangle = figure as Triangle;
+            renderer.DrawTriangle(triangle);
+
+            triangle.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(triangle, false);
+            };
+            if (figure.isSelected) { SelectFigure(triangle); }
          }
       }
 
@@ -281,6 +333,24 @@ namespace veceditor
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
+         else if (figure is Rectangle rectangle)
+         {
+            Circle point = new(rectangle.topLeft, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(rectangle.bottomRight, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
+         else if (figure is Triangle triangle)
+         {
+            Circle point = new(triangle.topPoint, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(triangle.bottomPoint1, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
       }
 
       private async void OnSavePngClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -332,6 +402,10 @@ namespace veceditor
             circle.figure.Stroke = newColor;
          else if (figure is Line line)
             line.figure.Stroke = newColor;
+         else  if (figure is Rectangle rectangle)
+            rectangle.figure.Stroke = newColor;
+         else if (figure is Triangle triangle)
+            triangle.figure.Stroke = newColor;
       }
 
       public void OnKeyDown(object sender, KeyEventArgs e)

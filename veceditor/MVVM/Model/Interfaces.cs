@@ -31,6 +31,9 @@ namespace veceditor.MVVM.Model
     {
         void DrawCircle(Circle circle);
         void DrawLine(Line line);
+        void DrawRectangle(Rectangle rectangle);
+        void DrawTriangle(Triangle triangle);
+
     }
     public interface IDrawableFigure
     {

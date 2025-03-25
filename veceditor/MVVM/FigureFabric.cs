@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using veceditor.MVVM.Model;
@@ -144,17 +146,42 @@ namespace veceditor.MVVM
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point firstPoint;
-      public Point secondPoint;
-      public Point thirdPoint;
-      
+      public Point topPoint;
+      public Point bottomPoint1;
+      public Point bottomPoint2;
+      internal Polygon? figure;
+
       //public Ellipse? figure;
-      public Triangle(Point xPoint, Point yPoint)
+      public Triangle(Point topPoint, Point bottomPoint1)
       {
-         this.firstPoint = xPoint;
-         this.secondPoint = new Point(yPoint.x, xPoint.y);
-         this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);
-         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);        
+         this.topPoint = topPoint;
+         this.bottomPoint1 = bottomPoint1;
+
+         // Рассчитываем вторую боковую точку (bottomPoint2)
+         CalculateBottomPoint2();
+
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+      }
+
+      // Метод для вычисления второй боковой точки
+      public void CalculateBottomPoint2()
+      {
+         // Проверяем, где расположена первая точка основания относительно верхней точки
+         double deltaX = bottomPoint1.x - topPoint.x;
+         double deltaY = bottomPoint1.y - topPoint.y;
+
+         // Если первая точка ниже верхней, то зеркалим по оси X
+         if (deltaY > 0)
+         {
+            double bottomPoint2X = topPoint.x - deltaX; // Симметричное расположение по X
+            bottomPoint2 = new Point(bottomPoint2X, bottomPoint1.y);
+         }
+         // Если первая точка выше верхней, то зеркалим по оси Y
+         else
+         {
+            double bottomPoint2Y = topPoint.y - deltaY; // Симметричное расположение по Y
+            bottomPoint2 = new Point(bottomPoint1.x, bottomPoint2Y);
+         }
       }
 
       public bool IsClosed => throw new NotImplementedException();
@@ -174,28 +201,63 @@ namespace veceditor.MVVM
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
 
-   public class Rectangle : IFigure
+   public class Rectangle : ReactiveObject, IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point firstPoint;
-      public Point secondPoint;
-      public Point thirdPoint;
-      public Point fourthPoint;
+      public Point topLeft;
+      public Point bottomRight;
+      internal Path? figure;
 
-      //public Ellipse? figure;
-      public Rectangle(Point xPoint, Point yPoint)
+      public Point TopLeft
       {
-         this.firstPoint = xPoint;
-         this.secondPoint = new Point(yPoint.x, xPoint.y);
-         this.thirdPoint = new Point(xPoint.x, yPoint.y);
-         this.fourthPoint = yPoint;
-         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         get => topLeft;
+         set => this.RaiseAndSetIfChanged(ref topLeft, value);
       }
-      
 
-      public bool IsClosed => throw new NotImplementedException();
+      public Point BottomRight
+      {
+         get => bottomRight;
+         set => this.RaiseAndSetIfChanged(ref bottomRight, value);
+      }
+
+      public double Width => Math.Abs(bottomRight.x - topLeft.x);
+      public double Height => Math.Abs(bottomRight.y - topLeft.y);
+
+      public Rectangle(Point point1, Point point2)
+      {
+         this.topLeft = point1;
+         this.bottomRight = point2;
+
+         UpdatePoint();
+         
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);  // Можно заменить на любой цвет
+      }
+
+      public void UpdatePoint()
+      {
+         Point point1 = topLeft;
+         Point point2 = bottomRight;
+         if (point1.x < point2.x && point1.y < point2.y)
+         {
+            this.topLeft = point1;
+            this.bottomRight = point2;
+         }
+         else if (point1.x > point2.x && point1.y > point2.y)
+         {
+            this.topLeft = point2;
+            this.bottomRight = point1;
+         }
+         else
+         {
+            // Если одна точка по оси X или Y больше другой, их нужно инвертировать
+            this.topLeft = new Point(Math.Min(point1.x, point2.x), Math.Min(point1.y, point2.y));
+            this.bottomRight = new Point(Math.Max(point1.x, point2.x), Math.Max(point1.y, point2.y));
+         }
+      }
+
+      public bool IsClosed => true;
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
       public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
@@ -211,8 +273,8 @@ namespace veceditor.MVVM
       public void Scale(Point Center, double rad) => throw new NotImplementedException();
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
-
    }
+
 
    public class DrawingRenderer : IGraphicInterface
    {
@@ -270,27 +332,78 @@ namespace veceditor.MVVM
          canvas.Children.Add(lineShape);
       }
 
+      public void DrawRectangle(Rectangle rectangle)
+      {
+         var rect = new RectangleGeometry
+         {
+            Rect = new Avalonia.Rect(rectangle.TopLeft.x, rectangle.TopLeft.y, rectangle.Width, rectangle.Height)
+         };
+
+         var rectShape = new Path
+         {
+            Stroke = new SolidColorBrush(rectangle.ColorFigure),
+            StrokeThickness = rectangle.strokeThickness,
+            Data = rect
+         };
+
+         canvas.Children.Add(rectShape);
+         rectangle.figure = rectShape;
+      }
+
+
+      public void DrawTriangle(Triangle triangle)
+      {
+         var triangleShape = new Polygon
+         {
+            Points = new AvaloniaList<Avalonia.Point>
+        {
+            new Avalonia.Point(triangle.topPoint.x, triangle.topPoint.y),
+            new Avalonia.Point(triangle.bottomPoint1.x, triangle.bottomPoint1.y),
+            new Avalonia.Point(triangle.bottomPoint2.x, triangle.bottomPoint2.y)
+        },
+            Stroke = new SolidColorBrush(triangle.ColorFigure),
+            StrokeThickness = triangle.strokeThickness,
+            //Fill = new SolidColorBrush(triangle.FillColor) // Можно добавить заливку (если нужно)
+         };
+
+         canvas.Children.Add(triangleShape);
+         triangle.figure = triangleShape;
+      }
+
       public void Erase(IFigure figure)
       {
-         if (figure is Line)
+         if (figure is Line line)
          {
-            var line = figure as Line;
             if (line.figure != null)
             {
                canvas.Children.Remove(line.figure);
                line.figure = null;
             }
          }
-         else if (figure is Circle)
+         else if (figure is Circle circle)
          {
-            var circle = figure as Circle;
             if (circle.figure != null)
             {
                canvas.Children.Remove(circle.figure);
                circle.figure = null;
             }
          }
+         else if(figure is Rectangle rectangle)
+         {
+            if (rectangle.figure != null)
+            {
+               canvas.Children.Remove(rectangle.figure);
+               rectangle.figure = null;
+            }
+         }
+         else if (figure is Triangle triangle)
+         {
+            if (triangle.figure != null)
+            {
+               canvas.Children.Remove(triangle.figure);
+               triangle.figure = null;
+            }
+         }
       }
-      
    }
 }
