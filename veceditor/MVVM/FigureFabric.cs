@@ -237,7 +237,7 @@ namespace veceditor.MVVM
 
          UpdatePoint();
          
-         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);  // Можно заменить на любой цвет
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
 
       public void UpdatePoint()
