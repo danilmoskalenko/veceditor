@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using veceditor.MVVM.Model;
@@ -19,6 +20,27 @@ namespace veceditor.MVVM
 {
    public class FigureFabric
    {
+      public IFigure CreateFromJson(Point pt1, Point pt2, FigureType type,
+      Avalonia.Media.Color color, double _strokeThickness)
+      {
+         IFigure fig_obj = null;
+         switch (type)
+         {
+            case FigureType.Line:
+               fig_obj = new Line(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Circle:
+               fig_obj = new Circle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Triangle:
+               fig_obj = new Triangle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Rectangle:
+               fig_obj = new Rectangle(pt1, pt2, color, _strokeThickness);
+               break;
+         }
+         return fig_obj;
+      }
       public IFigure Create(Point pt1, Point pt2, FigureType type)
       {
          IFigure fig_obj = null;
@@ -44,6 +66,13 @@ namespace veceditor.MVVM
    
    public class Line : IFigure
    {
+      public Line(Point start, Point end, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.start = start;
+         this.end = end;
+         ColorFigure = color;
+         this._strokeThickness = strokeThickness;
+      }
       public Point start;
       public Point end;
       public Path? figure;
@@ -84,6 +113,16 @@ namespace veceditor.MVVM
       private double _strokeThickness = 2;
       private Point center;
       private Point radPoint;
+      public Circle(Point center, Point radPoint, Avalonia.Media.Color color, double strokeThickness)
+      {
+         this.center = center;
+         this.radPoint = radPoint;
+         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
+         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+      }
 
       public Point Center
       {
@@ -141,6 +180,17 @@ namespace veceditor.MVVM
 
    public class Triangle : ReactiveObject, IFigure
    {
+      public Triangle(Point xPoint, Point yPoint, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.firstPoint = xPoint;
+         this.secondPoint = new Point(yPoint.x, xPoint.y);
+         this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.FirstPoint).Subscribe(_ => UpdateSides());
+         this.WhenAnyValue(x => x.FourthPoint).Subscribe(_ => UpdateSides());
+      }
+
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
@@ -213,6 +263,17 @@ namespace veceditor.MVVM
       private Point thirdPoint;
       private Point fourthPoint;
 
+      public Rectangle(Point xPoint, Point yPoint, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.firstPoint = xPoint;
+         this.secondPoint = new Point(yPoint.x, xPoint.y);
+         this.thirdPoint = new Point(xPoint.x, yPoint.y);
+         this.fourthPoint = yPoint;
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.FirstPoint).Subscribe(_ => UpdateSides());
+         this.WhenAnyValue(x => x.FourthPoint).Subscribe(_ => UpdateSides());
+      }
       public Point FirstPoint
       {
           get => firstPoint;
@@ -325,6 +386,7 @@ namespace veceditor.MVVM
          canvas.Children.Add(lineShape);
       }
 
+      
       public void Erase(IFigure figure)
       {
          if (figure is Line)
