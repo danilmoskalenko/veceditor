@@ -25,11 +25,11 @@ namespace veceditor.MVVM.View
          viewModel.notReDraw = true;
          if (figure is Circle circle)
          {
-            viewModel.X1 = circle.center.x;
-            viewModel.Y1 = circle.center.y;
+            viewModel.X1 = circle.Center.x;
+            viewModel.Y1 = circle.Center.y;
 
-            viewModel.X2 = circle.radPoint.x;
-            viewModel.Y2 = circle.radPoint.y;
+            viewModel.X2 = circle.RadPoint.x;
+            viewModel.Y2 = circle.RadPoint.y;
 
             viewModel.StrokeThickness = circle.strokeThickness;
 

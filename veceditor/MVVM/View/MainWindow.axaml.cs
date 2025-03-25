@@ -20,6 +20,7 @@ using veceditor.MVVM.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
 using Point = veceditor.MVVM.Model.Point;
+using Rectangle = veceditor.MVVM.Rectangle;
 
 namespace veceditor
 {
@@ -99,6 +100,7 @@ namespace veceditor
          SelText.Text = $"{viewModel._SelectedFigure}";
          _canvas.Children.Add(SelText); 
       }
+      
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
          if (_canvas == null) return;
@@ -117,6 +119,8 @@ namespace veceditor
          switch (_selectedFigure)
          {
             case FigureType.Point:
+
+               
                var ellipse = new Ellipse
                {
                   Width = 6,
@@ -132,7 +136,9 @@ namespace veceditor
 
 
             case FigureType.Line:
+
                if (_points.Count % 2 != 0) break;
+
                var line = viewModel.FigureCreate(_points[^2], _points[^1]) as Line;
                renderer.DrawLine(line);
                _points.Clear();
@@ -274,10 +280,10 @@ namespace veceditor
          }
          else if(figure is Circle circle)
          {
-            Circle point = new(circle.center, new Point(0, 0));
+            Circle point = new(circle.Center, new Point(0, 0));
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(circle.radPoint, new Point(0, 0));
+            point = new(circle.RadPoint, new Point(0, 0));
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }

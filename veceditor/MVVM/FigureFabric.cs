@@ -82,8 +82,8 @@ namespace veceditor.MVVM
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point center;
-      public Point radPoint;
+      private Point center;
+      private Point radPoint;
 
       public Point Center
       {
@@ -139,14 +139,33 @@ namespace veceditor.MVVM
 
    }
 
-   public class Triangle : IFigure
+   public class Triangle : ReactiveObject, IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point firstPoint;
-      public Point secondPoint;
-      public Point thirdPoint;
+      private Point firstPoint;
+      private Point secondPoint;
+      private Point thirdPoint;
+      private Point fourthPoint;
+
+      public Point FirstPoint
+      {
+          get => firstPoint;
+          set
+          {             
+               this.RaiseAndSetIfChanged(ref firstPoint, value);              
+          }
+      }
+
+      public Point FourthPoint
+      {
+          get => fourthPoint;
+          set
+          {              
+               this.RaiseAndSetIfChanged(ref fourthPoint, value);              
+          }
+      }
       
       //public Ellipse? figure;
       public Triangle(Point xPoint, Point yPoint)
@@ -154,7 +173,17 @@ namespace veceditor.MVVM
          this.firstPoint = xPoint;
          this.secondPoint = new Point(yPoint.x, xPoint.y);
          this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);
-         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);        
+         this.fourthPoint = yPoint;
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);  
+         this.WhenAnyValue(x => x.FirstPoint).Subscribe(_=> UpdateSides());
+         this.WhenAnyValue(x => x.FourthPoint).Subscribe(_=> UpdateSides());
+         
+      }
+
+      private void UpdateSides()
+      {
+           this.secondPoint = new Point(fourthPoint.x, firstPoint.y);
+           this.thirdPoint = new Point((firstPoint.x + fourthPoint.x) / 2, fourthPoint.y);
       }
 
       public bool IsClosed => throw new NotImplementedException();
@@ -174,15 +203,33 @@ namespace veceditor.MVVM
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
 
-   public class Rectangle : IFigure
+   public class Rectangle : ReactiveObject, IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Point firstPoint;
-      public Point secondPoint;
-      public Point thirdPoint;
-      public Point fourthPoint;
+      private Point firstPoint;
+      private Point secondPoint;
+      private Point thirdPoint;
+      private Point fourthPoint;
+
+      public Point FirstPoint
+      {
+          get => firstPoint;
+          set
+          {             
+               this.RaiseAndSetIfChanged(ref firstPoint, value);              
+          }
+      }
+
+      public Point FourthPoint
+      {
+          get => fourthPoint;
+          set
+          {              
+               this.RaiseAndSetIfChanged(ref fourthPoint, value);              
+          }
+      }
 
       //public Ellipse? figure;
       public Rectangle(Point xPoint, Point yPoint)
@@ -192,6 +239,14 @@ namespace veceditor.MVVM
          this.thirdPoint = new Point(xPoint.x, yPoint.y);
          this.fourthPoint = yPoint;
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         this.WhenAnyValue(x => x.FirstPoint).Subscribe(_=> UpdateSides());
+         this.WhenAnyValue(x => x.FourthPoint).Subscribe(_=> UpdateSides());
+      }
+
+      private void UpdateSides()
+      {
+           this.secondPoint = new Point(fourthPoint.x, firstPoint.y);
+           this.thirdPoint = new Point(firstPoint.x, fourthPoint.y);
       }
       
 
@@ -230,8 +285,8 @@ namespace veceditor.MVVM
             Fill = Brushes.Red
          };
 
-         Canvas.SetLeft(circle, circleObj.center.x - 3);
-         Canvas.SetTop(circle, circleObj.center.y - 3);
+         Canvas.SetLeft(circle, circleObj.Center.x - 3);
+         Canvas.SetTop(circle, circleObj.Center.y - 3);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
@@ -247,8 +302,8 @@ namespace veceditor.MVVM
             //Fill = Brushes.Transparent
          };
 
-         Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
-         Canvas.SetTop(circle, circleObj.center.y - circleObj.rad);
+         Canvas.SetLeft(circle, circleObj.Center.x - circleObj.rad);
+         Canvas.SetTop(circle, circleObj.Center.y - circleObj.rad);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
