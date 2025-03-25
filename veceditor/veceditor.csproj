@@ -35,8 +35,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Icons\icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AvaloniaResource>
+    <AvaloniaResource Include="Icons\**" />
   </ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="Icons\Circle.png" />
+		<AvaloniaResource Include="Icons\Edit.png" />
+		<AvaloniaResource Include="Icons\Line.png" />
+		<AvaloniaResource Include="Icons\Point.png" />
+		<AvaloniaResource Include="Icons\Rectangle.png" />
+		<AvaloniaResource Include="Icons\Triangle.png" />
+	</ItemGroup>
 </Project>

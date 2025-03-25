@@ -1,4 +1,4 @@
-﻿﻿using Avalonia;
+﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -274,18 +274,20 @@ namespace veceditor.MVVM
       private double _strokeThickness = 2;
       private Point topLeft;
       private Point bottomRight;
+      public Point _topLeft;
+      public Point _bottomRight;
       internal Path? figure;
 
       public Point TopLeft
       {
          get => topLeft;
-         set => this.RaiseAndSetIfChanged(ref topLeft, value);
+         set { this.RaiseAndSetIfChanged(ref topLeft, value); UpdatePoint(); }
       }
 
       public Point BottomRight
       {
          get => bottomRight;
-         set => this.RaiseAndSetIfChanged(ref bottomRight, value);
+         set { this.RaiseAndSetIfChanged(ref bottomRight, value); UpdatePoint(); }
       }
 
       public double Width => Math.Abs(bottomRight.x - topLeft.x);
@@ -298,7 +300,7 @@ namespace veceditor.MVVM
 
          UpdatePoint();
          
-         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);  // Можно заменить на любой цвет
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
       public Rectangle(Point point1, Point point2, Avalonia.Media.Color color, double _strokeThickness)
       {
@@ -314,21 +316,22 @@ namespace veceditor.MVVM
       {
          Point point1 = topLeft;
          Point point2 = bottomRight;
+
          if (point1.x < point2.x && point1.y < point2.y)
          {
-            this.topLeft = point1;
-            this.bottomRight = point2;
+            this._topLeft = point1;
+            this._bottomRight = point2;
          }
          else if (point1.x > point2.x && point1.y > point2.y)
          {
-            this.topLeft = point2;
-            this.bottomRight = point1;
+            this._topLeft = point2;
+            this._bottomRight = point1;
          }
          else
          {
             // Если одна точка по оси X или Y больше другой, их нужно инвертировать
-            this.topLeft = new Point(Math.Min(point1.x, point2.x), Math.Min(point1.y, point2.y));
-            this.bottomRight = new Point(Math.Max(point1.x, point2.x), Math.Max(point1.y, point2.y));
+            this._topLeft = new Point(Math.Min(point1.x, point2.x), Math.Min(point1.y, point2.y));
+            this._bottomRight = new Point(Math.Max(point1.x, point2.x), Math.Max(point1.y, point2.y));
          }
       }
 
@@ -411,7 +414,7 @@ namespace veceditor.MVVM
       {
          var rect = new RectangleGeometry
          {
-            Rect = new Avalonia.Rect(rectangle.TopLeft.x, rectangle.TopLeft.y, rectangle.Width, rectangle.Height)
+            Rect = new Avalonia.Rect(rectangle._topLeft.x, rectangle._topLeft.y, rectangle.Width, rectangle.Height)
          };
 
          var rectShape = new Path
