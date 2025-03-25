@@ -52,6 +52,9 @@ namespace veceditor.MVVM.Model
       bool IsClosed { get; }
       string Name { get; set; }
       Avalonia.Media.Color ColorFigure { get; set; }
+      double strokeThickness { get; set; }
+
+      bool isSelected { get; set; }
    }
 
 }
