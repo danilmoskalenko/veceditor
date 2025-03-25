@@ -164,7 +164,6 @@ namespace veceditor.MVVM.ViewModel
       public IFigure FigureCreate(Point pt1, Point pt2)
       {
          var figure = fabric.Create(pt1, pt2, _SelectedFigure);
-         Figures.Add(figure);
          return figure;
       }
       //Удаление фигур

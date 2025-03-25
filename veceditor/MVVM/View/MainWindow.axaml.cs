@@ -142,11 +142,12 @@ namespace veceditor
                };
 
                InteractFigure(line, true);
+               viewModel.Figures.Add(line);
                break;
 
             case FigureType.Circle:
                if (_points.Count % 2 != 0) break;
-               var circle = (Circle)viewModel.FigureCreate(_points[^2], _points[^1]);
+               var circle = viewModel.FigureCreate(_points[^2], _points[^1]) as Circle;
                //double rad = circle.rad;
                renderer.DrawCircle(circle);
                _points.Clear();
@@ -156,7 +157,7 @@ namespace veceditor
                };
 
                InteractFigure(circle, true);
-
+               viewModel.Figures.Add(circle);
                break;
          }
       }

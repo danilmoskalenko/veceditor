@@ -112,6 +112,7 @@ namespace veceditor.MVVM
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
          this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
          this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
 
       private void UpdateRadius()
@@ -152,7 +153,8 @@ namespace veceditor.MVVM
       {
          this.firstPoint = xPoint;
          this.secondPoint = new Point(yPoint.x, xPoint.y);
-         this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);          
+         this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);        
       }
 
       public bool IsClosed => throw new NotImplementedException();
