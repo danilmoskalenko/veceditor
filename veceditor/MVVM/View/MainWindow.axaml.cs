@@ -250,6 +250,7 @@ namespace veceditor
       }
       private void SelectFigure(IFigure figure)
       {
+         if (figure == null) return;
          figure.isSelected = true;
          DrawPoints(figure);
          ChangeColor(figure, new SolidColorBrush(Colors.Blue));
