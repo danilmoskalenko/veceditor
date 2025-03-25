@@ -216,8 +216,8 @@ namespace veceditor.MVVM
          CalculateBottomPoint2();
 
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
-         this.WhenAnyValue(x => x.topPoint).Subscribe(_ => CalculateBottomPoint2());
-         this.WhenAnyValue(x => x.bottomPoint1).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
       }
        public Triangle(Point topPoint, Point bottomPoint1, Avalonia.Media.Color color, double _strokeThickness)
       {
@@ -226,8 +226,8 @@ namespace veceditor.MVVM
          CalculateBottomPoint2();
          ColorFigure = color;
          this._strokeThickness = _strokeThickness;
-         this.WhenAnyValue(x => x.topPoint).Subscribe(_ => CalculateBottomPoint2());
-         this.WhenAnyValue(x => x.bottomPoint1).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
       }
       // Метод для вычисления второй боковой точки
       public void CalculateBottomPoint2()
