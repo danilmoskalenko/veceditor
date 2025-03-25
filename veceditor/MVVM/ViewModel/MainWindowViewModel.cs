@@ -19,6 +19,8 @@ namespace veceditor.MVVM.ViewModel
    public partial class MainWindowViewModel : ViewModelBase
    {
       int id_changes = -1;
+
+      FigureFabric fabric;
       // 0 - добавление фигуры
       // 1 - удаление фигуры
       public ReactiveCommand<FigureType, Unit> SelectFigure { get; }
@@ -67,6 +69,7 @@ namespace veceditor.MVVM.ViewModel
 
       public MainWindowViewModel()
       {
+         fabric = new FigureFabric();
          _selectedFigure = FigureType.Line;
          SelectFigure = ReactiveCommand.Create<FigureType>(Select);
 
@@ -158,9 +161,10 @@ namespace veceditor.MVVM.ViewModel
          }
       }
       //Добавление фигур
-      public void FigureCreate(IFigure figure)
+      public IFigure FigureCreate(Point pt1, Point pt2)
       {
-         Figures.Add(figure);
+         var figure = fabric.Create(pt1, pt2, _SelectedFigure);
+         return figure;
       }
       //Удаление фигур
       public void DeleteFigure()

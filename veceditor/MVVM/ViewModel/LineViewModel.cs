@@ -148,10 +148,9 @@ namespace veceditor.MVVM.ViewModel
          if (notReDraw) return;
          if (currentFigure is Circle circle)
          {
-            circle.center = new Point(X1,Y1);
-            circle.radPoint = new Point(X2,Y2);
-            circle.RadCalc();
-
+            circle.Center = new Point(X1,Y1);
+            circle.RadPoint = new Point(X2,Y2);
+            
             circle.strokeThickness = StrokeThickness;
             circle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
 
