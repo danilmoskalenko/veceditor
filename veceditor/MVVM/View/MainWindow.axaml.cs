@@ -8,11 +8,14 @@ using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reactive.Linq;
 using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
+using veceditor.MVVM.View;
 using veceditor.MVVM.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
@@ -54,6 +57,7 @@ namespace veceditor
             TextBlock();
             renderer = new DrawingRenderer(_canvas);
          }
+
          _canvas.PointerPressed += OnPointerPressed;
          _canvas.PointerMoved += OnPointerMoved;
          this.KeyDown += OnKeyDown;
@@ -110,39 +114,52 @@ namespace veceditor
          _points.Add(point);
 
          // Режим рисования точки
-         if (_selectedFigure == FigureType.Point)
+         switch (_selectedFigure)
          {
-            var ellipse = new Ellipse
-            {
-               Width = 6,
-               Height = 6,
-               Fill = Brushes.Black
-            };
-            Canvas.SetLeft(ellipse, point.x - 3);
-            Canvas.SetTop(ellipse, point.y - 3);
-            _canvas.Children.Add(ellipse);
-            _shapes.Add(ellipse);
-            _points.Clear();
+            case FigureType.Point:
+               var ellipse = new Ellipse
+               {
+                  Width = 6,
+                  Height = 6,
+                  Fill = Brushes.Black
+               };
+               Canvas.SetLeft(ellipse, point.x - 3);
+               Canvas.SetTop(ellipse, point.y - 3);
+               _canvas.Children.Add(ellipse);
+               _shapes.Add(ellipse);
+               _points.Clear();
+               break;
 
-            //Пример изменения цвета
-            //if (_shapes.Count > 1) ChangeColor(_shapes[^2], new SolidColorBrush(Colors.Red));
-         }
 
-         // Режим рисования линии
-         else if (_selectedFigure == FigureType.Line && _points.Count % 2 == 0)
-         {
-            var figure = viewModel.FigureCreate(_points[^2], _points[^1]);
-            renderer.DrawLine((Line)figure);            
-            _points.Clear();
-         }
+            case FigureType.Line:
+               if (_points.Count % 2 != 0) break;
+               var line = (Line)viewModel.FigureCreate(_points[^2], _points[^1]);
+               renderer.DrawLine(line);
+               _points.Clear();
+               line.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(line, false);
+               };
 
-         // Режим рисования круга
-         else if (_selectedFigure == FigureType.Circle && _points.Count % 2 == 0)
-         {
-            var figure = viewModel.FigureCreate(_points[^2], _points[^1]);
-            //double rad = circle.rad;
-            renderer.DrawCircle((Circle)figure);           
-            _points.Clear();
+               InteractFigure(line, true);
+               viewModel.FigureCreate(line);
+               break;
+
+            case FigureType.Circle:
+               if (_points.Count % 2 != 0) break;
+               var circle = (Circle)viewModel.FigureCreate(_points[^2], _points[^1]);
+               //double rad = circle.rad;
+               renderer.DrawCircle(circle);
+               _points.Clear();
+               circle.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(circle, false);
+               };
+
+               InteractFigure(circle, true);
+               viewModel.FigureCreate(circle);
+
+               break;
          }
       }
 
@@ -155,22 +172,117 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            if (_selectedFigure == FigureType.Line)
+            switch(_selectedFigure)
             {
-               Line line = new(start, end);
-               renderer.DrawLine(line);
-               tempFigure.Add(line);
-            }
-            if (_selectedFigure == FigureType.Circle)
-            {
-               Circle circle = new(start, end);
-               renderer.DrawCircle(circle);
-               tempFigure.Add(circle);
+               case FigureType.Line:
+                  Line line = new(start, end);
+                  renderer.DrawLine(line);
+                  tempFigure.Add(line);
+                  break;
+               case FigureType.Circle:
+                  Circle circle = new(start, end);
+                  renderer.DrawCircle(circle);
+                  tempFigure.Add(circle);
+                  break;
             }
             while (tempFigure.Count > 1) { renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0); }
          }
       }
-     
+
+      public void ReDraw(IFigure figure)
+      {
+         ClearPointList();
+
+         renderer.Erase(figure);
+         if (figure is Line)
+         {
+            var line = figure as Line;
+            renderer.DrawLine(line);
+
+            line.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(line, false);
+            };
+            if(figure.isSelected) { SelectFigure(line); }
+         }
+         else if (figure is Circle)
+         {
+            var circle = figure as Circle;
+            renderer.DrawCircle(circle);
+
+            circle.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(circle, false);
+            };
+            if (figure.isSelected) { SelectFigure(circle); }
+         }
+      }
+
+      private void InteractFigure(IFigure figure, bool ignoreMode)
+      {
+         if (_selectedFigure != FigureType.Edit && !ignoreMode) return;
+
+         // Убираем выделение (если есть)
+         UnselectFigure(viewModel.CurFigure);
+
+         viewModel.CurFigure = figure;
+
+         // Работа с выделением
+         SelectFigure(viewModel.CurFigure);
+      }
+
+      public List<Circle> selectPointList = new();
+      private void ClearPointList()
+      {
+         foreach (var ell in selectPointList)
+         {
+            renderer.Erase(ell);
+         }
+         selectPointList.Clear();
+      }
+      private void UnselectFigure(IFigure figure)
+      {
+         ClearPointList();
+         if (figure != null)
+         {
+            figure.isSelected = false;            
+            ChangeColor(figure, new SolidColorBrush(figure.ColorFigure));
+         }
+         //renderer.ReDraw(figure);
+      }
+      private void SelectFigure(IFigure figure)
+      {
+         figure.isSelected = true;
+         DrawPoints(figure);
+         ChangeColor(figure, new SolidColorBrush(Colors.Blue));
+         LineView.viewModel.mw = this;
+         LineView.viewModel.currentFigure = figure;
+         LineView.instance.FillInfo(figure);
+         //renderer.ReDraw(figure);
+      }
+
+      private void DrawPoints(IFigure figure)
+      {
+         if(figure is Line line)
+         {
+            Circle point = new(line.start, new Point(0,0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(line.end, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
+         else if(figure is Circle circle)
+         {
+            Circle point = new(circle.center, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(circle.radPoint, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
+      }
+
       private async void OnSavePngClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
       {
          if (_canvas == null) return;
@@ -214,12 +326,12 @@ namespace veceditor
          }
       }
 
-      public void ChangeColor(Shape shape, Brush newColor)
+      public void ChangeColor(IFigure figure, Brush newColor)
       {
-         if (shape is Ellipse ellipse)
-            ellipse.Fill = newColor;
-         else if (shape is Path path)
-            path.Stroke = newColor;
+         if (figure is Circle circle)
+            circle.figure.Stroke = newColor;
+         else if (figure is Line line)
+            line.figure.Stroke = newColor;
       }
 
       public void OnKeyDown(object sender, KeyEventArgs e)
@@ -227,6 +339,7 @@ namespace veceditor
          if (e.Key == Key.D)
          {
             viewModel.DeleteFigure();
+            InteractFigure(viewModel.CurFigure, true);
          }
          if (e.Key == Key.C)
          {
@@ -238,6 +351,8 @@ namespace veceditor
                   i--;
                }
             }
+            while(viewModel.Figures.Count != 0) viewModel.DeleteFigure();
+            UnselectFigure(null);
          }
       }
    }

@@ -8,6 +8,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,13 +47,24 @@ namespace veceditor.MVVM
       public Point start;
       public Point end;
       public Path? figure;
+
+      public bool _isSelected;
+
+      private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
       public Line (Point start, Point end)
       {
          this.start = start;
          this.end = end;
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
+
+
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -89,6 +101,10 @@ namespace veceditor.MVVM
       }
       public double rad;
       public Ellipse? figure;
+      public bool _isSelected;
+      private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
+
       public Circle(Point center, Point radPoint)
       {
          this.center = center;
@@ -162,10 +178,17 @@ namespace veceditor.MVVM
          this.secondPoint = new Point(yPoint.x, xPoint.y);
          this.thirdPoint = new Point(xPoint.x, yPoint.y);
          this.fourthPoint = yPoint;
+         RadCalc();
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
+      public void RadCalc() { rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2)); }
 
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
+
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -186,14 +209,30 @@ namespace veceditor.MVVM
       {
          this.canvas = canvas;
       }
+      public void DrawPoint(Circle circleObj)
+      {
+         var circle = new Ellipse
+         {
+            Width = 6,
+            Height = 6,
+            Fill = Brushes.Red
+         };
+
+         Canvas.SetLeft(circle, circleObj.center.x - 3);
+         Canvas.SetTop(circle, circleObj.center.y - 3);
+
+         canvas.Children.Add(circle);
+         circleObj.figure = circle;
+      }
       public void DrawCircle(Circle circleObj)
       {
          var circle = new Ellipse
          {
             Width = circleObj.rad * 2,
             Height = circleObj.rad * 2,
-            Stroke = Brushes.Black,
-            StrokeThickness = 2
+            Stroke = new SolidColorBrush(circleObj.ColorFigure),
+            StrokeThickness = circleObj.strokeThickness,
+            //Fill = Brushes.Transparent
          };
 
          Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
@@ -211,31 +250,12 @@ namespace veceditor.MVVM
          };
          var lineShape = new Path
          {
-            Stroke = Brushes.Black,
-            StrokeThickness = 2,
+            Stroke = new SolidColorBrush(line.ColorFigure),
+            StrokeThickness = line.strokeThickness,
             Data = lineGeom
          };
          line.figure = lineShape;
          canvas.Children.Add(lineShape);
-      }
-      public void DrawCircle(Point Center, double rad)
-      {
-            var circle = new Ellipse
-            {
-               Width = rad * 2,
-               Height = rad * 2,
-               Stroke = Brushes.Black,
-               StrokeThickness = 2
-            };
-         var clip = new RectangleGeometry
-         {
-            Rect = new Avalonia.Rect(0, 0, canvas.Width, canvas.Height)
-         };
-         circle.Clip = clip;
-         Canvas.SetLeft(circle, Center.x - rad);
-            Canvas.SetTop(circle, Center.y - rad);
-         
-         canvas.Children.Add(circle);
       }
 
       public void Erase(IFigure figure)
@@ -259,5 +279,6 @@ namespace veceditor.MVVM
             }
          }
       }
+      
    }
 }
