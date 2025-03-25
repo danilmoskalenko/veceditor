@@ -175,6 +175,10 @@ namespace veceditor.MVVM.ViewModel
       {
          Figures.Remove(curFigure);
       }
+      public void ClearFigures()
+      {
+         while (Figures.Count > 0) Figures.Remove(curFigure);
+      }
    }
 }
 
