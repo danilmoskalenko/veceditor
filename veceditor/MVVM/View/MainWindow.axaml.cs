@@ -111,7 +111,7 @@ namespace veceditor
          switch (_selectedFigure)
          {
             case FigureType.Point:
-               Circle _point = new(point, new Point(0, 0), true);
+               var _point = viewModel.FigureCreate(point, new Point(0, 0)) as Circle;
                renderer.DrawPoint(_point);
                _points.Clear();
                _point.figure.PointerPressed += (sender, e) =>
@@ -120,6 +120,7 @@ namespace veceditor
                };
 
                InteractFigure(_point, true);
+               viewModel.Figures.Add(_point);
                break;
 
 
