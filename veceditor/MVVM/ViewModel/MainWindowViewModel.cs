@@ -32,8 +32,8 @@ namespace veceditor.MVVM.ViewModel
         set => this.RaiseAndSetIfChanged(ref curFigure, value);
     }
       private bool _isEditMode;
-      public ICommand ForwardCommand { get; }
-      public ICommand BackwardCommand { get; }
+      public ICommand SaveCommand { get; }
+      public ICommand LoadCommand { get; }
       public ICommand EditModeCommand { get; }
 
       // Коллекция типов фигур
@@ -73,8 +73,8 @@ namespace veceditor.MVVM.ViewModel
          _selectedFigure = FigureType.Line;
          SelectFigure = ReactiveCommand.Create<FigureType>(Select);
 
-         ForwardCommand = ReactiveCommand.Create(ForwardAction);
-         BackwardCommand = ReactiveCommand.Create(BackwardAction);
+         SaveCommand = ReactiveCommand.Create(SaveAction);
+         LoadCommand = ReactiveCommand.Create(LoadAction);
          EditModeCommand = ReactiveCommand.Create(ToggleEditMode);
 
          Figures = new ObservableCollection<IFigure>();
@@ -138,14 +138,12 @@ namespace veceditor.MVVM.ViewModel
          }
       }
 
-      private void ForwardAction()
+      private void SaveAction()
       {
-         // Логика для "Вперёд" (Ctrl+R)
       }
 
-      private void BackwardAction()
+      private void LoadAction()
       {
-         // Логика для "Назад" (Ctrl+Z)
       }
 
       private void ToggleEditMode()
