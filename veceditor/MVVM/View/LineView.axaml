@@ -1,0 +1,33 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:veceditor.MVVM.ViewModel"
+             x:Class="veceditor.MVVM.View.LineView"
+             x:DataType="vm:LineViewModel">
+	<!-- Все ваши элементы, включая привязку -->
+	<StackPanel Margin="10">
+		<TextBlock Text="Настройки Фигуры" FontWeight="Bold"/>
+
+		<TextBlock Text="Начальная точка (X1, Y1):"/>
+		<StackPanel Orientation="Horizontal">
+			<TextBox Width="50" Text="{Binding X1, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+			<TextBox Width="50" Text="{Binding Y1, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+		</StackPanel>
+
+		<TextBlock Text="Конечная точка (X2, Y2):"/>
+		<StackPanel Orientation="Horizontal">
+			<TextBox Width="50" Text="{Binding X2, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+			<TextBox Width="50" Text="{Binding Y2, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+		</StackPanel>
+
+		<TextBlock Text="Толщина контура:"/>
+		<TextBox Text="{Binding StrokeThickness, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+
+		<TextBlock Text="Цвет контура (ARGB):"/>
+		<StackPanel Orientation="Horizontal">
+			<TextBox Width="25" Text="{Binding Color_A, Mode=TwoWay}"/>
+			<TextBox Width="25" Text="{Binding Color_R, Mode=TwoWay}"/>
+			<TextBox Width="25" Text="{Binding Color_G, Mode=TwoWay}"/>
+			<TextBox Width="25" Text="{Binding Color_B, Mode=TwoWay}"/>
+		</StackPanel>
+	</StackPanel>
+</UserControl>

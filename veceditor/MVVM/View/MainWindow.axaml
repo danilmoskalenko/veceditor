@@ -1,9 +1,68 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+        xmlns:vm="using:veceditor.MVVM.ViewModel"
+        xmlns:local="clr-namespace:veceditor"
+		xmlns:view="clr-namespace:veceditor.MVVM.View"
+		
         x:Class="veceditor.MainWindow"
-        Title="veceditor">
-	<Image x:Name="Picture"/>
+        x:DataType="vm:MainWindowViewModel"
+        Title="veceditor"
+        Width="900" Height="500">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/> <!-- Основное поле -->
+			<ColumnDefinition Width="300"/> <!-- Боковая панель -->
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="60"/> <!-- Панель инструментов сверху -->
+			<RowDefinition Height="*"/> <!-- Холст для рисования, заполняет оставшееся пространство -->
+		</Grid.RowDefinitions>
+
+		<!-- Верхняя панель инструментов -->
+		<Grid Background="Gray" Grid.Row="0" Grid.ColumnSpan="2">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
+				<Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/>
+				<Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/>
+
+				<!-- Выпадающее меню выбора фигуры -->
+				<ComboBox Width="120"
+                    SelectedItem="{Binding _SelectedFigure}"
+                    ItemsSource="{Binding FigureTypes}">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Image Source="avares://veceditor/Icons/icon.png" Width="20" Height="20"/>
+								<TextBlock Text="{Binding}" Margin="5,0,0,0"/>
+							</StackPanel>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				
+				<!-- Кнопка Режим редактирования -->
+				<Button Content="Режим редактирования" Command="{Binding EditModeCommand}" Margin="5,0,0,0"/>
+				
+				<!-- Save PNG Button -->
+				<Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
+				
+				<!-- Save SVG Button -->
+				<Button x:Name="SaveSvgButton" Content="Save as SVG" Click="OnSaveSvgClick" />
+			</StackPanel>
+		</Grid>
+
+		<!-- Холст для рисования -->
+		<Canvas x:Name="DrawingCanvas" Background="White" Grid.Row="1" Grid.Column="0"/>
+
+		<!-- Боковая панель настроек -->
+		<Border Background="LightGray" Grid.Row="1" Grid.Column="1" Padding="10">
+			<ContentControl x:Name="Info" Content="{Binding CurrentFigureSettings}">
+				<ContentControl.ContentTemplate>
+					<DataTemplate>
+						<view:LineView/>
+					</DataTemplate>
+				</ContentControl.ContentTemplate>
+			</ContentControl>
+		</Border>
+	</Grid>
+
 </Window>
