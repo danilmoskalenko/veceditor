@@ -26,11 +26,14 @@ namespace veceditor.MVVM
          IFigure fig_obj = null;
          switch (type)
          {
+            case FigureType.Point:
+               fig_obj = new Circle(pt1, pt2, true);
+               break;
             case FigureType.Line:
                fig_obj = new Line(pt1, pt2);
                break;
             case FigureType.Circle:
-               fig_obj = new Circle(pt1, pt2);
+               fig_obj = new Circle(pt1, pt2, false);
                break;
             case FigureType.Triangle:
                fig_obj = new Triangle(pt1, pt2);
@@ -86,6 +89,7 @@ namespace veceditor.MVVM
       private double _strokeThickness = 2;
       public Point center;
       public Point radPoint;
+      public bool isPoint;
 
       public Point Center
       {
@@ -107,10 +111,11 @@ namespace veceditor.MVVM
       public double rad;
       public Ellipse? figure;
 
-      public Circle(Point center, Point radPoint)
+      public Circle(Point center, Point radPoint, bool isPoint)
       {
          this.center = center;
          this.radPoint = radPoint;
+         this.isPoint = isPoint;
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
          this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
          this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
@@ -289,7 +294,7 @@ namespace veceditor.MVVM
          {
             Width = 6,
             Height = 6,
-            Fill = Brushes.Red
+            Fill = new SolidColorBrush(circleObj.ColorFigure)
          };
 
          Canvas.SetLeft(circle, circleObj.center.x - 3);

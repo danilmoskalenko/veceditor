@@ -111,17 +111,15 @@ namespace veceditor
          switch (_selectedFigure)
          {
             case FigureType.Point:
-               var ellipse = new Ellipse
-               {
-                  Width = 6,
-                  Height = 6,
-                  Fill = Brushes.Black
-               };
-               Canvas.SetLeft(ellipse, point.x - 3);
-               Canvas.SetTop(ellipse, point.y - 3);
-               _canvas.Children.Add(ellipse);
-               _shapes.Add(ellipse);
+               Circle _point = new(point, new Point(0, 0), true);
+               renderer.DrawPoint(_point);
                _points.Clear();
+               _point.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(_point, false);
+               };
+
+               InteractFigure(_point, true);
                break;
 
 
@@ -199,7 +197,7 @@ namespace veceditor
                   tempFigure.Add(line);
                   break;
                case FigureType.Circle:
-                  Circle circle = new(start, end);
+                  Circle circle = new(start, end, false);
                   renderer.DrawCircle(circle);
                   tempFigure.Add(circle);
                   break;
@@ -237,7 +235,10 @@ namespace veceditor
          else if (figure is Circle)
          {
             var circle = figure as Circle;
-            renderer.DrawCircle(circle);
+            if (circle.isPoint)
+               renderer.DrawPoint(circle);
+            else
+               renderer.DrawCircle(circle);
 
             circle.figure.PointerPressed += (sender, e) =>
             {
@@ -305,7 +306,13 @@ namespace veceditor
       {
          if (figure == null) return;
          figure.isSelected = true;
-         DrawPoints(figure);
+         bool drawFlag = true;
+         if ((figure is Circle circle))
+         {
+            if (circle.isPoint) drawFlag = false;
+         }
+         if(drawFlag)
+            DrawPoints(figure);
          ChangeColor(figure, new SolidColorBrush(Colors.Blue));
          LineView.viewModel.mw = this;
          LineView.viewModel.currentFigure = figure;
@@ -317,37 +324,61 @@ namespace veceditor
       {
          if(figure is Line line)
          {
-            Circle point = new(line.start, new Point(0,0));
+            Circle point = new(line.start, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(line.end, new Point(0, 0));
+            point = new(line.end, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
          else if(figure is Circle circle)
          {
-            Circle point = new(circle.center, new Point(0, 0));
+            Circle point = new(circle.center, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(circle.radPoint, new Point(0, 0));
+            point = new(circle.radPoint, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
          else if (figure is Rectangle rectangle)
          {
-            Circle point = new(rectangle.topLeft, new Point(0, 0));
+            Circle point = new(rectangle.topLeft, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(rectangle.bottomRight, new Point(0, 0));
+            point = new(rectangle.bottomRight, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
          else if (figure is Triangle triangle)
          {
-            Circle point = new(triangle.topPoint, new Point(0, 0));
+            Circle point = new(triangle.topPoint, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(triangle.bottomPoint1, new Point(0, 0));
+            point = new(triangle.bottomPoint1, new Point(0, 0), true)
+            {
+               ColorFigure = Colors.Red
+            };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
@@ -399,7 +430,12 @@ namespace veceditor
       public void ChangeColor(IFigure figure, Brush newColor)
       {
          if (figure is Circle circle)
-            circle.figure.Stroke = newColor;
+         {
+            if (circle.isPoint)
+               circle.figure.Fill = newColor;
+            else 
+               circle.figure.Stroke = newColor;
+         }
          else if (figure is Line line)
             line.figure.Stroke = newColor;
          else  if (figure is Rectangle rectangle)
