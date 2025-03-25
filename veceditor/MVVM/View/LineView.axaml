@@ -22,7 +22,7 @@
 		<TextBlock Text="Толщина контура:"/>
 		<TextBox Text="{Binding StrokeThickness, Mode=TwoWay}"/>
 
-		<TextBlock Text="Цвет контура (RGB):"/>
+		<TextBlock Text="Цвет контура (ARGB):"/>
 		<StackPanel Orientation="Horizontal">
 			<TextBox Width="25" Text="{Binding Color_A, Mode=TwoWay}"/>
 			<TextBox Width="25" Text="{Binding Color_R, Mode=TwoWay}"/>
