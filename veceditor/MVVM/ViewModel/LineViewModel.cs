@@ -171,8 +171,8 @@ namespace veceditor.MVVM.ViewModel
          }
          else if (currentFigure is Rectangle rectangle)
          {
-            rectangle.topLeft = new Point(X1, Y1);
-            rectangle.bottomRight = new Point(X2, Y2);
+            rectangle.TopLeft = new Point(X1, Y1);
+            rectangle.BottomRight = new Point(X2, Y2);
             rectangle.UpdatePoint();
 
             rectangle.strokeThickness = StrokeThickness;

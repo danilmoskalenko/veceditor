@@ -355,13 +355,13 @@ namespace veceditor
          }
          else if (figure is Rectangle rectangle)
          {
-            Circle point = new(rectangle.topLeft, new Point(0, 0), true)
+            Circle point = new(rectangle.TopLeft, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(rectangle.bottomRight, new Point(0, 0), true)
+            point = new(rectangle.BottomRight, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
