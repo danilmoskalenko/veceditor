@@ -133,7 +133,7 @@ namespace veceditor
 
             case FigureType.Line:
                if (_points.Count % 2 != 0) break;
-               var line = (Line)viewModel.FigureCreate(_points[^2], _points[^1]);
+               var line = viewModel.FigureCreate(_points[^2], _points[^1]) as Line;
                renderer.DrawLine(line);
                _points.Clear();
                line.figure.PointerPressed += (sender, e) =>
@@ -142,7 +142,6 @@ namespace veceditor
                };
 
                InteractFigure(line, true);
-               viewModel.FigureCreate(line);
                break;
 
             case FigureType.Circle:
@@ -157,7 +156,6 @@ namespace veceditor
                };
 
                InteractFigure(circle, true);
-               viewModel.FigureCreate(circle);
 
                break;
          }

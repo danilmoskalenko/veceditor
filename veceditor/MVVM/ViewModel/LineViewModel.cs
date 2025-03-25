@@ -150,7 +150,6 @@ namespace veceditor.MVVM.ViewModel
          {
             circle.center = new Point(X1,Y1);
             circle.radPoint = new Point(X2,Y2);
-            circle.RadCalc();
 
             circle.strokeThickness = StrokeThickness;
             circle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);

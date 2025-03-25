@@ -79,6 +79,9 @@ namespace veceditor.MVVM
 
    public class Circle : ReactiveObject, IFigure
    {
+      public bool _isSelected;
+      private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
       public Point center;
       public Point radPoint;
 
@@ -101,9 +104,6 @@ namespace veceditor.MVVM
       }
       public double rad;
       public Ellipse? figure;
-      public bool _isSelected;
-      private Avalonia.Media.Color color;
-      private double _strokeThickness = 2;
 
       public Circle(Point center, Point radPoint)
       {
@@ -122,6 +122,9 @@ namespace veceditor.MVVM
       
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -137,6 +140,9 @@ namespace veceditor.MVVM
 
    public class Triangle : IFigure
    {
+      public bool _isSelected;
+      private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
       public Point firstPoint;
       public Point secondPoint;
       public Point thirdPoint;
@@ -151,6 +157,9 @@ namespace veceditor.MVVM
 
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -161,11 +170,13 @@ namespace veceditor.MVVM
       public void Scale(Point Center, double rad) => throw new NotImplementedException();
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
-
    }
 
    public class Rectangle : IFigure
    {
+      public bool _isSelected;
+      private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
       public Point firstPoint;
       public Point secondPoint;
       public Point thirdPoint;
@@ -178,10 +189,9 @@ namespace veceditor.MVVM
          this.secondPoint = new Point(yPoint.x, xPoint.y);
          this.thirdPoint = new Point(xPoint.x, yPoint.y);
          this.fourthPoint = yPoint;
-         RadCalc();
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
-      public void RadCalc() { rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2)); }
+      
 
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
