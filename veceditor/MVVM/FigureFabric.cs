@@ -301,6 +301,8 @@ namespace veceditor.MVVM
          UpdatePoint();
          
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
+         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
       }
       public Rectangle(Point point1, Point point2, Avalonia.Media.Color color, double _strokeThickness)
       {
