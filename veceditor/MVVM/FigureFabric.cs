@@ -3,9 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.Threading;
+using ReactiveUI;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,10 +65,28 @@ namespace veceditor.MVVM
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
 
-   public class Circle : IFigure
+   public class Circle : ReactiveObject, IFigure
    {
       public Point center;
       public Point radPoint;
+
+      public Point Center
+      {
+          get => center;
+          set
+          {             
+               this.RaiseAndSetIfChanged(ref center, value);              
+          }
+      }
+
+      public Point RadPoint
+      {
+          get => radPoint;
+          set
+          {              
+               this.RaiseAndSetIfChanged(ref radPoint, value);              
+          }
+      }
       public double rad;
       public Ellipse? figure;
       public Circle(Point center, Point radPoint)
@@ -74,8 +94,16 @@ namespace veceditor.MVVM
          this.center = center;
          this.radPoint = radPoint;
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
+         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
       }
 
+      private void UpdateRadius()
+      {
+           this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+      }
+
+      
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
