@@ -55,10 +55,10 @@
 
 		<!-- Боковая панель настроек -->
 		<Border Background="LightGray" Grid.Row="1" Grid.Column="1" Padding="10">
-			<ContentControl Content="{Binding CurrentFigureSettings}">
+			<ContentControl x:Name="Info" Content="{Binding CurrentFigureSettings}">
 				<ContentControl.ContentTemplate>
 					<DataTemplate>
-						<view:LineView />
+						<view:LineView/>
 					</DataTemplate>
 				</ContentControl.ContentTemplate>
 			</ContentControl>

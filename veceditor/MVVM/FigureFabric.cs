@@ -30,7 +30,10 @@ namespace veceditor.MVVM
       public Point end;
       public Path? figure;
 
+      public bool _isSelected;
+
       private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
       public Line (Point start, Point end)
       {
          this.start = start;
@@ -40,6 +43,9 @@ namespace veceditor.MVVM
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
+
 
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
@@ -59,19 +65,25 @@ namespace veceditor.MVVM
       public Point radPoint;
       public double rad;
       public Ellipse? figure;
+      public bool _isSelected;
       private Avalonia.Media.Color color;
+      private double _strokeThickness = 2;
 
       public Circle(Point center, Point radPoint)
       {
          this.center = center;
          this.radPoint = radPoint;
-         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         RadCalc();
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
+      public void RadCalc() { rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2)); }
 
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
+      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
+
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -114,7 +126,7 @@ namespace veceditor.MVVM
             Width = circleObj.rad * 2,
             Height = circleObj.rad * 2,
             Stroke = new SolidColorBrush(circleObj.ColorFigure),
-            StrokeThickness = 2,
+            StrokeThickness = circleObj.strokeThickness,
             //Fill = Brushes.Transparent
          };
 
@@ -134,7 +146,7 @@ namespace veceditor.MVVM
          var lineShape = new Path
          {
             Stroke = new SolidColorBrush(line.ColorFigure),
-            StrokeThickness = 2,
+            StrokeThickness = line.strokeThickness,
             Data = lineGeom
          };
          line.figure = lineShape;
@@ -162,19 +174,6 @@ namespace veceditor.MVVM
             }
          }
       }
-      public void ReDraw(IFigure figure)
-      {
-         Erase(figure);
-         if (figure is Line)
-         {
-            var line = figure as Line;
-            DrawLine(line);
-         }
-         else if (figure is Circle)
-         {
-            var circle = figure as Circle;
-            DrawCircle(circle);
-         }
-      }
+      
    }
 }

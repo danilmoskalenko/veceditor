@@ -15,6 +15,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using veceditor.MVVM;
 using veceditor.MVVM.Model;
+using veceditor.MVVM.View;
 using veceditor.MVVM.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 using Line = veceditor.MVVM.Line;
@@ -56,6 +57,7 @@ namespace veceditor
             TextBlock();
             renderer = new DrawingRenderer(_canvas);
          }
+
          _canvas.PointerPressed += OnPointerPressed;
          _canvas.PointerMoved += OnPointerMoved;
          this.KeyDown += OnKeyDown;
@@ -186,6 +188,35 @@ namespace veceditor
          }
       }
 
+      public void ReDraw(IFigure figure)
+      {
+         ClearPointList();
+
+         renderer.Erase(figure);
+         if (figure is Line)
+         {
+            var line = figure as Line;
+            renderer.DrawLine(line);
+
+            line.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(line, false);
+            };
+            if(figure.isSelected) { SelectFigure(line); }
+         }
+         else if (figure is Circle)
+         {
+            var circle = figure as Circle;
+            renderer.DrawCircle(circle);
+
+            circle.figure.PointerPressed += (sender, e) =>
+            {
+               InteractFigure(circle, false);
+            };
+            if (figure.isSelected) { SelectFigure(circle); }
+         }
+      }
+
       private void InteractFigure(IFigure figure, bool ignoreMode)
       {
          if (_selectedFigure != FigureType.Edit && !ignoreMode) return;
@@ -200,21 +231,32 @@ namespace veceditor
       }
 
       public List<Circle> selectPointList = new();
-      private void UnselectFigure(IFigure figure)
+      private void ClearPointList()
       {
          foreach (var ell in selectPointList)
          {
             renderer.Erase(ell);
          }
          selectPointList.Clear();
+      }
+      private void UnselectFigure(IFigure figure)
+      {
+         ClearPointList();
          if (figure != null)
+         {
+            figure.isSelected = false;            
             ChangeColor(figure, new SolidColorBrush(figure.ColorFigure));
+         }
          //renderer.ReDraw(figure);
       }
       private void SelectFigure(IFigure figure)
       {
+         figure.isSelected = true;
          DrawPoints(figure);
          ChangeColor(figure, new SolidColorBrush(Colors.Blue));
+         LineView.viewModel.mw = this;
+         LineView.viewModel.currentFigure = figure;
+         LineView.instance.FillInfo(figure);
          //renderer.ReDraw(figure);
       }
 
