@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,8 @@ namespace veceditor.MVVM
       public Point start;
       public Point end;
       public Path? figure;
+
+      private Avalonia.Media.Color color = Avalonia.Media.Color.FromRgb(0, 0, 0);
       public Line (Point start, Point end)
       {
          this.start = start;
@@ -35,6 +38,8 @@ namespace veceditor.MVVM
       }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
+
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -53,6 +58,8 @@ namespace veceditor.MVVM
       public Point radPoint;
       public double rad;
       public Ellipse? figure;
+      private Avalonia.Media.Color color = Avalonia.Media.Color.FromRgb(0, 0, 0);
+
       public Circle(Point center, Point radPoint)
       {
          this.center = center;
@@ -62,6 +69,7 @@ namespace veceditor.MVVM
 
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
@@ -82,14 +90,30 @@ namespace veceditor.MVVM
       {
          this.canvas = canvas;
       }
+      public void DrawPoint(Circle circleObj)
+      {
+         var circle = new Ellipse
+         {
+            Width = 6,
+            Height = 6,
+            Fill = Brushes.Red
+         };
+
+         Canvas.SetLeft(circle, circleObj.center.x - 3);
+         Canvas.SetTop(circle, circleObj.center.y - 3);
+
+         canvas.Children.Add(circle);
+         circleObj.figure = circle;
+      }
       public void DrawCircle(Circle circleObj)
       {
          var circle = new Ellipse
          {
             Width = circleObj.rad * 2,
             Height = circleObj.rad * 2,
-            Stroke = Brushes.Black,
-            StrokeThickness = 2
+            Stroke = new SolidColorBrush(circleObj.ColorFigure),
+            StrokeThickness = 2,
+            //Fill = Brushes.Transparent
          };
 
          Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
@@ -107,31 +131,12 @@ namespace veceditor.MVVM
          };
          var lineShape = new Path
          {
-            Stroke = Brushes.Black,
+            Stroke = new SolidColorBrush(line.ColorFigure),
             StrokeThickness = 2,
             Data = lineGeom
          };
          line.figure = lineShape;
          canvas.Children.Add(lineShape);
-      }
-      public void DrawCircle(Point Center, double rad)
-      {
-            var circle = new Ellipse
-            {
-               Width = rad * 2,
-               Height = rad * 2,
-               Stroke = Brushes.Black,
-               StrokeThickness = 2
-            };
-         var clip = new RectangleGeometry
-         {
-            Rect = new Avalonia.Rect(0, 0, canvas.Width, canvas.Height)
-         };
-         circle.Clip = clip;
-         Canvas.SetLeft(circle, Center.x - rad);
-            Canvas.SetTop(circle, Center.y - rad);
-         
-         canvas.Children.Add(circle);
       }
 
       public void Erase(IFigure figure)
@@ -153,6 +158,20 @@ namespace veceditor.MVVM
                canvas.Children.Remove(circle.figure);
                circle.figure = null;
             }
+         }
+      }
+      public void ReDraw(IFigure figure)
+      {
+         Erase(figure);
+         if (figure is Line)
+         {
+            var line = figure as Line;
+            DrawLine(line);
+         }
+         else if (figure is Circle)
+         {
+            var circle = figure as Circle;
+            DrawCircle(circle);
          }
       }
    }

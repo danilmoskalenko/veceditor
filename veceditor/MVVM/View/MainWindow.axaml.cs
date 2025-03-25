@@ -8,7 +8,9 @@ using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reactive.Linq;
 using System.Threading;
 using veceditor.MVVM;
@@ -130,8 +132,14 @@ namespace veceditor
                if (_points.Count % 2 != 0) break;
                var line = new Line(_points[^2], _points[^1]);
                renderer.DrawLine(line);
-               viewModel.FigureCreate(line);
                _points.Clear();
+               line.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(line, false);
+               };
+
+               InteractFigure(line, true);
+               viewModel.FigureCreate(line);
                break;
 
             case FigureType.Circle:
@@ -139,8 +147,15 @@ namespace veceditor
                var circle = new Circle(_points[^2], _points[^1]);
                //double rad = circle.rad;
                renderer.DrawCircle(circle);
-               viewModel.FigureCreate(circle);
                _points.Clear();
+               circle.figure.PointerPressed += (sender, e) =>
+               {
+                  InteractFigure(circle, false);
+               };
+
+               InteractFigure(circle, true);
+               viewModel.FigureCreate(circle);
+
                break;
          }
       }
@@ -160,30 +175,68 @@ namespace veceditor
                   Line line = new(start, end);
                   renderer.DrawLine(line);
                   tempFigure.Add(line);
-                  line.figure.PointerPressed += (sender, e) =>
-                  {
-                     InteractFigure(line);
-                  };
                   break;
                case FigureType.Circle:
                   Circle circle = new(start, end);
                   renderer.DrawCircle(circle);
                   tempFigure.Add(circle);
-                  circle.figure.PointerPressed += (sender, e) =>
-                  {
-                     InteractFigure(circle);
-                  };
                   break;
             }
             while (tempFigure.Count > 1) { renderer.Erase(tempFigure[0]); tempFigure.RemoveAt(0); }
          }
       }
 
-      private void InteractFigure(IFigure figure)
+      private void InteractFigure(IFigure figure, bool ignoreMode)
       {
+         if (_selectedFigure != FigureType.Edit && !ignoreMode) return;
+
          // Убираем выделение (если есть)
+         UnselectFigure(viewModel.CurFigure);
+
          viewModel.CurFigure = figure;
+
          // Работа с выделением
+         SelectFigure(viewModel.CurFigure);
+      }
+
+      public List<Circle> selectPointList = new();
+      private void UnselectFigure(IFigure figure)
+      {
+         foreach (var ell in selectPointList)
+         {
+            renderer.Erase(ell);
+         }
+         selectPointList.Clear();
+         ChangeColor(figure, new SolidColorBrush(Colors.Black));
+         //renderer.ReDraw(figure);
+      }
+      private void SelectFigure(IFigure figure)
+      {
+         DrawPoints(figure);
+         ChangeColor(figure, new SolidColorBrush(Colors.Blue));
+         //renderer.ReDraw(figure);
+      }
+
+      private void DrawPoints(IFigure figure)
+      {
+         if(figure is Line line)
+         {
+            Circle point = new(line.start, new Point(0,0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(line.end, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
+         else if(figure is Circle circle)
+         {
+            Circle point = new(circle.center, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+            point = new(circle.radPoint, new Point(0, 0));
+            renderer.DrawPoint(point);
+            selectPointList.Add(point);
+         }
       }
 
       private async void OnSavePngClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -229,12 +282,12 @@ namespace veceditor
          }
       }
 
-      public void ChangeColor(Shape shape, Brush newColor)
+      public void ChangeColor(IFigure figure, Brush newColor)
       {
-         if (shape is Ellipse ellipse)
-            ellipse.Fill = newColor;
-         else if (shape is Path path)
-            path.Stroke = newColor;
+         if (figure is Circle circle)
+            circle.figure.Stroke = newColor;
+         else if (figure is Line line)
+            line.figure.Stroke = newColor;
       }
 
       public void OnKeyDown(object sender, KeyEventArgs e)

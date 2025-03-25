@@ -29,7 +29,7 @@ namespace veceditor.MVVM.Model
     }
     public interface IGraphicInterface
     {
-        void DrawCircle(Point Center, double rad);
+        void DrawCircle(Circle circle);
         void DrawLine(Line line);
     }
     public interface IDrawableFigure
@@ -37,21 +37,21 @@ namespace veceditor.MVVM.Model
         void Draw(IGraphicInterface graphic);
     }
 
-    public interface IFigure
-    {
-        bool IsInternal(Point p, double eps);
-        IFigure Intersect(IFigure other);
-        IFigure Union(IFigure other);
-        IFigure Subtract(IFigure other);
-        void Move(Point vector);
-        void Rotate(Point Center, double angle);
-        void Scale(double x, double y);
-        void Scale(Point Center, double rad);
-        void Reflection(Point ax1, Point ax2);
-        IEnumerable<IDrawableFigure> GetDrawFigures();
-        bool IsClosed { get; }
-        string Name { get; set; }
-        
+   public interface IFigure
+   {
+      bool IsInternal(Point p, double eps);
+      IFigure Intersect(IFigure other);
+      IFigure Union(IFigure other);
+      IFigure Subtract(IFigure other);
+      void Move(Point vector);
+      void Rotate(Point Center, double angle);
+      void Scale(double x, double y);
+      void Scale(Point Center, double rad);
+      void Reflection(Point ax1, Point ax2);
+      IEnumerable<IDrawableFigure> GetDrawFigures();
+      bool IsClosed { get; }
+      string Name { get; set; }
+      Avalonia.Media.Color ColorFigure { get; set; }
    }
 
 }
