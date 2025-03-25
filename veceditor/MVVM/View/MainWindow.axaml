@@ -47,6 +47,9 @@
 				
 				<!-- Save PNG Button -->
 				<Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
+				
+				<!-- Save SVG Button -->
+				<Button x:Name="SaveSvgButton" Content="Save as SVG" Click="OnSaveSvgClick" />
 			</StackPanel>
 		</Grid>
 
