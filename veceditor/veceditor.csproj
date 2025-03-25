@@ -31,6 +31,7 @@
     </PackageReference>
     <PackageReference Include="DynamicData" Version="9.1.2" />
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
