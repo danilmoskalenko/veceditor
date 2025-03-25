@@ -207,7 +207,8 @@ namespace veceditor
             renderer.Erase(ell);
          }
          selectPointList.Clear();
-         ChangeColor(figure, new SolidColorBrush(Colors.Black));
+         if (figure != null)
+            ChangeColor(figure, new SolidColorBrush(figure.ColorFigure));
          //renderer.ReDraw(figure);
       }
       private void SelectFigure(IFigure figure)
@@ -295,6 +296,7 @@ namespace veceditor
          if (e.Key == Key.D)
          {
             viewModel.DeleteFigure();
+            InteractFigure(viewModel.CurFigure, true);
          }
          if (e.Key == Key.C)
          {
@@ -306,6 +308,8 @@ namespace veceditor
                   i--;
                }
             }
+            while(viewModel.Figures.Count != 0) viewModel.DeleteFigure();
+            UnselectFigure(null);
          }
       }
    }
