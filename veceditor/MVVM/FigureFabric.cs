@@ -30,11 +30,12 @@ namespace veceditor.MVVM
       public Point end;
       public Path? figure;
 
-      private Avalonia.Media.Color color = Avalonia.Media.Color.FromRgb(0, 0, 0);
+      private Avalonia.Media.Color color;
       public Line (Point start, Point end)
       {
          this.start = start;
          this.end = end;
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -58,13 +59,14 @@ namespace veceditor.MVVM
       public Point radPoint;
       public double rad;
       public Ellipse? figure;
-      private Avalonia.Media.Color color = Avalonia.Media.Color.FromRgb(0, 0, 0);
+      private Avalonia.Media.Color color;
 
       public Circle(Point center, Point radPoint)
       {
          this.center = center;
          this.radPoint = radPoint;
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
 
       public bool IsClosed => throw new NotImplementedException();
