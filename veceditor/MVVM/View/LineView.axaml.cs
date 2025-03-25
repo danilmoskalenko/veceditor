@@ -58,11 +58,11 @@ namespace veceditor.MVVM.View
          }
          else if (figure is Rectangle rectangle)
          {
-            viewModel.X1 = rectangle.topLeft.x;
-            viewModel.Y1 = rectangle.topLeft.y;
+            viewModel.X1 = rectangle.TopLeft.x;
+            viewModel.Y1 = rectangle.TopLeft.y;
 
-            viewModel.X2 = rectangle.bottomRight.x;
-            viewModel.Y2 = rectangle.bottomRight.y;
+            viewModel.X2 = rectangle.BottomRight.x;
+            viewModel.Y2 = rectangle.BottomRight.y;
 
             viewModel.StrokeThickness = rectangle.strokeThickness;
 

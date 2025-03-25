@@ -26,11 +26,8 @@
 		<!-- Верхняя панель инструментов -->
 		<Grid Background="Gray" Grid.Row="0" Grid.ColumnSpan="2">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
-				<!-- Кнопка Вперёд (Ctrl+Z) -->
-				<Button Content="Вперёд" Command="{Binding ForwardCommand}" Margin="10,0,0,0"/>
-
-				<!-- Кнопка Назад (Ctrl+R) -->
-				<Button Content="Назад" Command="{Binding BackwardCommand}" Margin="5,0,20,0"/>
+				<Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/>
+				<Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/>
 
 				<!-- Выпадающее меню выбора фигуры -->
 				<!--<ComboBox Width="120"
