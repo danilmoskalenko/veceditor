@@ -1,6 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using ReactiveUI;
 using veceditor.MVVM.Model;
 using veceditor.MVVM.ViewModel;
@@ -52,6 +55,36 @@ namespace veceditor.MVVM.View
             viewModel.Color_R = line.ColorFigure.R;
             viewModel.Color_G = line.ColorFigure.G;
             viewModel.Color_B = line.ColorFigure.B;
+         }
+         else if (figure is Rectangle rectangle)
+         {
+            viewModel.X1 = rectangle.topLeft.x;
+            viewModel.Y1 = rectangle.topLeft.y;
+
+            viewModel.X2 = rectangle.bottomRight.x;
+            viewModel.Y2 = rectangle.bottomRight.y;
+
+            viewModel.StrokeThickness = rectangle.strokeThickness;
+
+            viewModel.Color_A = rectangle.ColorFigure.A;
+            viewModel.Color_R = rectangle.ColorFigure.R;
+            viewModel.Color_G = rectangle.ColorFigure.G;
+            viewModel.Color_B = rectangle.ColorFigure.B;
+         }
+         else if (figure is Triangle triangle)
+         {
+            viewModel.X1 = triangle.topPoint.x;
+            viewModel.Y1 = triangle.topPoint.y;
+
+            viewModel.X2 = triangle.bottomPoint1.x;
+            viewModel.Y2 = triangle.bottomPoint1.y;
+
+            viewModel.StrokeThickness = triangle.strokeThickness;
+
+            viewModel.Color_A = triangle.ColorFigure.A;
+            viewModel.Color_R = triangle.ColorFigure.R;
+            viewModel.Color_G = triangle.ColorFigure.G;
+            viewModel.Color_B = triangle.ColorFigure.B;
          }
          viewModel.notReDraw = false;
       }
