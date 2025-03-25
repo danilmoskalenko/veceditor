@@ -11,18 +11,34 @@ using System.Text;
 using System.Threading.Tasks;
 using veceditor.MVVM.Model;
 using Point = veceditor.MVVM.Model.Point;
+
 namespace veceditor.MVVM
 {
    public class FigureFabric
    {
-      void Create(Point start, Point end, FigureType type)
+      public IFigure Create(Point pt1, Point pt2, FigureType type)
       {
+         IFigure fig_obj = null;
          switch (type)
          {
-            
+            case FigureType.Line:
+               fig_obj = new Line(pt1, pt2);
+               break;
+            case FigureType.Circle:
+               fig_obj = new Circle(pt1, pt2);
+               break;
+            case FigureType.Triangle:
+               fig_obj = new Triangle(pt1, pt2);
+               break;
+            case FigureType.Rectangle:
+               fig_obj = new Rectangle(pt1, pt2);
+               break;
          }
+         return fig_obj;
       }
    }
+
+   
    public class Line : IFigure
    {
       public Point start;
@@ -58,6 +74,66 @@ namespace veceditor.MVVM
          this.center = center;
          this.radPoint = radPoint;
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+      }
+
+      public bool IsClosed => throw new NotImplementedException();
+      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
+      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
+      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
+      public void Move(Point vector) => throw new NotImplementedException();
+      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
+      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
+      public void Scale(double x, double y) => throw new NotImplementedException();
+      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
+      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+
+   }
+
+   public class Triangle : IFigure
+   {
+      public Point firstPoint;
+      public Point secondPoint;
+      public Point thirdPoint;
+      
+      //public Ellipse? figure;
+      public Triangle(Point xPoint, Point yPoint)
+      {
+         this.firstPoint = xPoint;
+         this.secondPoint = new Point(yPoint.x, xPoint.y);
+         this.thirdPoint = new Point((yPoint.x + xPoint.x) / 2, yPoint.y);          
+      }
+
+      public bool IsClosed => throw new NotImplementedException();
+      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
+      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
+      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
+      public void Move(Point vector) => throw new NotImplementedException();
+      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
+      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
+      public void Scale(double x, double y) => throw new NotImplementedException();
+      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
+      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+
+   }
+
+   public class Rectangle : IFigure
+   {
+      public Point firstPoint;
+      public Point secondPoint;
+      public Point thirdPoint;
+      public Point fourthPoint;
+
+      //public Ellipse? figure;
+      public Rectangle(Point xPoint, Point yPoint)
+      {
+         this.firstPoint = xPoint;
+         this.secondPoint = new Point(yPoint.x, xPoint.y);
+         this.thirdPoint = new Point(xPoint.x, yPoint.y);
+         this.fourthPoint = yPoint;
       }
 
       public bool IsClosed => throw new NotImplementedException();

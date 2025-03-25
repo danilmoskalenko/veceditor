@@ -131,19 +131,17 @@ namespace veceditor
          // Режим рисования линии
          else if (_selectedFigure == FigureType.Line && _points.Count % 2 == 0)
          {
-            var line = new Line(_points[^2], _points[^1]);
-            renderer.DrawLine(line);
-            viewModel.FigureCreate(line);
+            var figure = viewModel.FigureCreate(_points[^2], _points[^1]);
+            renderer.DrawLine((Line)figure);            
             _points.Clear();
          }
 
          // Режим рисования круга
          else if (_selectedFigure == FigureType.Circle && _points.Count % 2 == 0)
          {
-            var circle = new Circle(_points[^2], _points[^1]);
+            var figure = viewModel.FigureCreate(_points[^2], _points[^1]);
             //double rad = circle.rad;
-            renderer.DrawCircle(circle);
-            viewModel.FigureCreate(circle);
+            renderer.DrawCircle((Circle)figure);           
             _points.Clear();
          }
       }
