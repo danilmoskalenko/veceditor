@@ -30,9 +30,14 @@
 		<!-- Верхняя панель инструментов -->
 		<Grid Background="Gray" Grid.Row="0" Grid.ColumnSpan="2">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
-				<Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/>
-				<Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/>
-
+				<!-- <Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/> -->
+				<!-- <Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/> -->
+				
+				<!-- Save State Button -->
+				<Button x:Name="SaveStateButton" Content="Save State" Click="OnSaveStateClick" />
+				<!-- Load State Button -->
+				<Button x:Name="LoadStateButton" Content="Load State" Click="OnLoadStateClick" />
+				
 				<!-- Выпадающее меню выбора фигуры -->
 				<!--<ComboBox Width="120"
     SelectedItem="{Binding _SelectedFigure}"

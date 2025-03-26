@@ -3,6 +3,7 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="veceditor/MVVM/View/LineView.axaml" value="veceditor/veceditor.csproj" />
         <entry key="veceditor/MVVM/View/MainWindow.axaml" value="veceditor/veceditor.csproj" />
       </map>
     </option>

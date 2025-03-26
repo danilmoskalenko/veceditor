@@ -131,6 +131,15 @@ namespace veceditor.MVVM
       }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+
+      public FigureData getFigureData() => new FigureData
+      {
+         Type = "Line",
+         Start = new PointData(start),
+         End = new PointData(end),
+         Color = color,
+         StrokeThickness = strokeThickness
+      };
    }
 
    public class Circle : ReactiveObject, IFigure
@@ -241,6 +250,15 @@ namespace veceditor.MVVM
       }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      
+      public FigureData getFigureData() => new FigureData
+      {
+         Type = isPoint ? "Point"  : "Circle",
+         Start = new PointData(center),
+         End = new PointData(radPoint),
+         Color = color,
+         StrokeThickness = strokeThickness
+      };
 
    }
 
@@ -358,6 +376,15 @@ namespace veceditor.MVVM
       }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      
+      public FigureData getFigureData() => new FigureData
+      {
+         Type = "Triangle",
+         Start = new PointData(topPoint),
+         End = new PointData(bottomPoint1),
+         Color = color,
+         StrokeThickness = strokeThickness
+      };
    }
 
 
@@ -527,6 +554,15 @@ namespace veceditor.MVVM
       }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      
+      public FigureData getFigureData() => new FigureData
+      {
+         Type = "Rectangle",
+         Start = new PointData(topLeft),
+         End = new PointData(bottomRight),
+         Color = color,
+         StrokeThickness = strokeThickness
+      };
    }
 
 
