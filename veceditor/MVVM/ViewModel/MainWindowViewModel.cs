@@ -138,8 +138,7 @@ namespace veceditor.MVVM.ViewModel
                break;
          }
       }
-
-      public MainWindow window { get; set; }
+      
       private async void SaveAction()
       {
          try
