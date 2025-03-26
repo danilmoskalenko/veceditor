@@ -12,33 +12,33 @@ using System.Threading.Tasks;
 
 namespace veceditor.MVVM.Model
 {
-    public class Point
-    {
-        public double x, y;
-        public Point(double x, double y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-    }
-    public interface IFigureGraphicProperties
-    {
-        Color SolidColor { get; }
-        Color BorderColor { get; }
+   public class Point
+   {
+      public double x, y;
+      public Point(double x, double y)
+      {
+         this.x = x;
+         this.y = y;
+      }
+   }
+   public interface IFigureGraphicProperties
+   {
+      Color SolidColor { get; }
+      Color BorderColor { get; }
 
-    }
-    public interface IGraphicInterface
-    {
-        void DrawCircle(Circle circle);
-        void DrawLine(Line line);
-        void DrawRectangle(Rectangle rectangle);
-        void DrawTriangle(Triangle triangle);
+   }
+   public interface IGraphicInterface
+   {
+      void DrawCircle(Circle circle);
+      void DrawLine(Line line);
+      void DrawRectangle(Rectangle rectangle);
+      void DrawTriangle(Triangle triangle);
 
-    }
-    public interface IDrawableFigure
-    {
-        void Draw(IGraphicInterface graphic);
-    }
+   }
+   public interface IDrawableFigure
+   {
+      void Draw(IGraphicInterface graphic);
+   }
 
    public interface IFigure
    {
@@ -47,15 +47,18 @@ namespace veceditor.MVVM.Model
       IFigure Union(IFigure other);
       IFigure Subtract(IFigure other);
       void Move(Point vector);
+      Point GetCenter();
       void Rotate(Point Center, double angle);
       void Scale(double x, double y);
       void Scale(Point Center, double rad);
       void Reflection(Point ax1, Point ax2);
       IEnumerable<IDrawableFigure> GetDrawFigures();
+
       bool IsClosed { get; }
       string Name { get; set; }
       Avalonia.Media.Color ColorFigure { get; set; }
       double strokeThickness { get; set; }
+      FigureData getFigureData();
 
       bool isSelected { get; set; }
    }

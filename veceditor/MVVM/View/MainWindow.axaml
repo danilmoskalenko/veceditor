@@ -14,21 +14,30 @@
 	</Window.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/> <!-- Основное поле -->
-			<ColumnDefinition Width="300"/> <!-- Боковая панель -->
+			<ColumnDefinition Width="*"/>
+			<!-- Основное поле -->
+			<ColumnDefinition Width="300"/>
+			<!-- Боковая панель -->
 		</Grid.ColumnDefinitions>
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="60"/> <!-- Панель инструментов сверху -->
-			<RowDefinition Height="*"/> <!-- Холст для рисования, заполняет оставшееся пространство -->
+			<RowDefinition Height="60"/>
+			<!-- Панель инструментов сверху -->
+			<RowDefinition Height="*"/>
+			<!-- Холст для рисования, заполняет оставшееся пространство -->
 		</Grid.RowDefinitions>
 
 		<!-- Верхняя панель инструментов -->
 		<Grid Background="Gray" Grid.Row="0" Grid.ColumnSpan="2">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="10" Margin="10,0,0,0">
-				<Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/>
-				<Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/>
-
+				<!-- <Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0"/> -->
+				<!-- <Button Content="Load" Command="{Binding LoadCommand}" Margin="5,0,20,0"/> -->
+				
+				<!-- Save State Button -->
+				<Button x:Name="SaveStateButton" Content="Save State" Click="OnSaveStateClick" />
+				<!-- Load State Button -->
+				<Button x:Name="LoadStateButton" Content="Load State" Click="OnLoadStateClick" />
+				
 				<!-- Выпадающее меню выбора фигуры -->
 				<!--<ComboBox Width="120"
     SelectedItem="{Binding _SelectedFigure}"
@@ -59,10 +68,10 @@
 
 				<!-- Кнопка Режим редактирования -->
 				<Button Content="Режим редактирования" Command="{Binding EditModeCommand}" Margin="5,0,0,0"/>
-				
+
 				<!-- Save PNG Button -->
 				<Button x:Name="SavePngButton" Content="Save as PNG" Click="OnSavePngClick" />
-				
+
 				<!-- Save SVG Button -->
 				<Button x:Name="SaveSvgButton" Content="Save as SVG" Click="OnSaveSvgClick" />
 			</StackPanel>
@@ -73,14 +82,32 @@
 
 		<!-- Боковая панель настроек -->
 		<Border Background="LightGray" Grid.Row="1" Grid.Column="1" Padding="10">
-			<ContentControl x:Name="Info" Content="{Binding CurrentFigureSettings}">
-				<ContentControl.ContentTemplate>
-					<DataTemplate>
-						<view:LineView/>
-					</DataTemplate>
-				</ContentControl.ContentTemplate>
-			</ContentControl>
+			<StackPanel Orientation="Vertical" Spacing="10">
+				<!-- Панель управления выделенной фигурой -->
+				<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+					<Button Content="↻  Поворот" Click="OnRotateRightClick" Width="40"/>
+					<Button Content="+" Click="OnScaleUpClick" Width="40"/>
+					<Button Content="↺" Click="OnRotateLeftClick" Width="40"/>
+					<Button Content="-" Click="OnScaleDownClick" Width="40"/>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+					<Button Content="↑" Click="OnMoveUpClick" Width="30"/>
+					<Button Content="↓" Click="OnMoveDownClick" Width="30"/>
+					<Button Content="←" Click="OnMoveLeftClick" Width="30"/>
+					<Button Content="→" Click="OnMoveRightClick" Width="30"/>
+				</StackPanel>
+
+				<!-- Настройки фигуры -->
+				<ContentControl x:Name="Info" Content="{Binding CurrentFigureSettings}">
+					<ContentControl.ContentTemplate>
+						<DataTemplate>
+							<view:LineView/>
+						</DataTemplate>
+					</ContentControl.ContentTemplate>
+				</ContentControl>
+			</StackPanel>
 		</Border>
+
 	</Grid>
 
 </Window>

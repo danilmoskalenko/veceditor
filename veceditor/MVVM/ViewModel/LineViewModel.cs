@@ -173,7 +173,6 @@ namespace veceditor.MVVM.ViewModel
          {
             rectangle.TopLeft = new Point(X1, Y1);
             rectangle.BottomRight = new Point(X2, Y2);
-            rectangle.UpdatePoint();
 
             rectangle.strokeThickness = StrokeThickness;
             rectangle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
@@ -184,7 +183,6 @@ namespace veceditor.MVVM.ViewModel
          {
             triangle.topPoint = new Point(X1, Y1);
             triangle.bottomPoint1 = new Point(X2, Y2);
-            triangle.CalculateBottomPoint2();
 
             triangle.strokeThickness = StrokeThickness;
             triangle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);
