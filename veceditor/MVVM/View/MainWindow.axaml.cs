@@ -567,7 +567,11 @@ namespace veceditor
             var filePath = await saveFileDialog.ShowAsync(this);
             if (string.IsNullOrEmpty(filePath))
                return;
-            
+            var list = viewModel.Figures.ToList();
+            for (int i = 0; i< viewModel.Figures.ToList().Count; i++)
+            {
+               if (viewModel.Figures.ToList()[i] == null) { viewModel.Figures.ToList().RemoveAt(i); i--; }
+            }
             var state = new ProgramState
             {
                Figures = viewModel.Figures.ToList().Select(figure => figure.getFigureData()).ToList()

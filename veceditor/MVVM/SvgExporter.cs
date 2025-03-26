@@ -99,21 +99,12 @@ namespace veceditor.MVVM
                             // Добавляем начальную точку
                             points.Append($"{pathFigure.StartPoint.X.ToString(invariantCulture)},{pathFigure.StartPoint.Y.ToString(invariantCulture)} ");
                             
-                            // Добавляем остальные точки из сегментов
-                            // Для треугольника нам нужны только первые 2 точки из сегментов
-                            // (3-я точка - это возврат к начальной точке)
-                            int pointCount = 0;
+                            // Добавляем все точки из сегментов
                             foreach (var segment in pathFigure.Segments)
                             {
                                 if (segment is LineSegment lineSegment)
                                 {
                                     points.Append($"{lineSegment.Point.X.ToString(invariantCulture)},{lineSegment.Point.Y.ToString(invariantCulture)} ");
-                                    pointCount++;
-                                    
-                                    // Для треугольника достаточно первых двух точек сегментов
-                                    // (третий сегмент - это замыкание к начальной точке)
-                                    if (pointCount >= 2 && pathFigure.Segments.Count == 3)
-                                        break;
                                 }
                             }
                             
@@ -121,6 +112,18 @@ namespace veceditor.MVVM
                             svgBuilder.AppendLine($"<polygon points=\"{points.ToString().Trim()}\" " +
                                                  $"style=\"fill:none; stroke-width:2; stroke:rgb(0,0,0)\"/>");
                         }
+                    }
+                    else if (child is Polygon polygon)
+                    {
+                        // Обрабатываем треугольник
+                        var points = new StringBuilder();
+                        foreach (var point in polygon.Points)
+                        {
+                            points.Append($"{point.X.ToString(invariantCulture)},{point.Y.ToString(invariantCulture)} ");
+                        }
+                        
+                        svgBuilder.AppendLine($"<polygon points=\"{points.ToString().Trim()}\" " +
+                                             $"style=\"fill:none; stroke-width:2; stroke:rgb(0,0,0)\"/>");
                     }
                 }
                 
