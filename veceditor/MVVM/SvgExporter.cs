@@ -63,7 +63,9 @@ namespace veceditor.MVVM
                         {
                             double x = Canvas.GetLeft(ellipse) + ellipse.Width / 2;
                             double y = Canvas.GetTop(ellipse) + ellipse.Height / 2;
-                            svgBuilder.AppendLine($"<circle cx=\"{x.ToString(invariantCulture)}\" cy=\"{y.ToString(invariantCulture)}\" r=\"3\" fill=\"black\"/>");
+                            var color = (ellipse.Fill as SolidColorBrush)?.Color;
+                            string fillColor = color != null ? $"rgb({color.Value.R},{color.Value.G},{color.Value.B})" : "black";
+                            svgBuilder.AppendLine($"<circle cx=\"{x.ToString(invariantCulture)}\" cy=\"{y.ToString(invariantCulture)}\" r=\"3\" fill=\"{fillColor}\"/>");
                         }
                         else
                         {
@@ -71,7 +73,9 @@ namespace veceditor.MVVM
                             double cy = Canvas.GetTop(ellipse) + ellipse.Height / 2;
                             double rx = ellipse.Width / 2;
                             double ry = ellipse.Height / 2;
-                            svgBuilder.AppendLine($"<ellipse cx=\"{cx.ToString(invariantCulture)}\" cy=\"{cy.ToString(invariantCulture)}\" rx=\"{rx.ToString(invariantCulture)}\" ry=\"{ry.ToString(invariantCulture)}\" fill=\"none\" stroke=\"black\" stroke-width=\"2\"/>");
+                            var color = (ellipse.Stroke as SolidColorBrush)?.Color;
+                            string strokeColor = color != null ? $"rgb({color.Value.R},{color.Value.G},{color.Value.B})" : "black";
+                            svgBuilder.AppendLine($"<ellipse cx=\"{cx.ToString(invariantCulture)}\" cy=\"{cy.ToString(invariantCulture)}\" rx=\"{rx.ToString(invariantCulture)}\" ry=\"{ry.ToString(invariantCulture)}\" fill=\"none\" stroke=\"{strokeColor}\" stroke-width=\"{ellipse.StrokeThickness}\"/>");
                         }
                     }
                     else if (child is Path path)
@@ -79,16 +83,19 @@ namespace veceditor.MVVM
                         // Обрабатываем разные типы фигур на основе их Data
                         if (path.Data is LineGeometry lineGeom)
                         {
+                            var color = (path.Stroke as SolidColorBrush)?.Color;
+                            string strokeColor = color != null ? $"rgb({color.Value.R},{color.Value.G},{color.Value.B})" : "black";
                             svgBuilder.AppendLine($"<line x1=\"{lineGeom.StartPoint.X.ToString(invariantCulture)}\" y1=\"{lineGeom.StartPoint.Y.ToString(invariantCulture)}\" " +
                                                  $"x2=\"{lineGeom.EndPoint.X.ToString(invariantCulture)}\" y2=\"{lineGeom.EndPoint.Y.ToString(invariantCulture)}\" " +
-                                                 $"stroke=\"black\" stroke-width=\"2\"/>");
+                                                 $"stroke=\"{strokeColor}\" stroke-width=\"{path.StrokeThickness}\"/>");
                         }
                         else if (path.Data is RectangleGeometry rectGeom)
                         {
-                            // Прямоугольник задается двумя точками: верхняя левая и нижняя правая
+                            var color = (path.Stroke as SolidColorBrush)?.Color;
+                            string strokeColor = color != null ? $"rgb({color.Value.R},{color.Value.G},{color.Value.B})" : "black";
                             svgBuilder.AppendLine($"<rect x=\"{rectGeom.Rect.X.ToString(invariantCulture)}\" y=\"{rectGeom.Rect.Y.ToString(invariantCulture)}\" " +
                                                  $"width=\"{rectGeom.Rect.Width.ToString(invariantCulture)}\" height=\"{rectGeom.Rect.Height.ToString(invariantCulture)}\" " +
-                                                 $"style=\"fill:none; stroke-width:2; stroke:rgb(0,0,0)\"/>");
+                                                 $"style=\"fill:none; stroke-width:{path.StrokeThickness}; stroke:{strokeColor}\"/>");
                         }
                         else if (path.Data is PathGeometry pathGeom && pathGeom.Figures.Count > 0)
                         {
@@ -122,8 +129,10 @@ namespace veceditor.MVVM
                             points.Append($"{point.X.ToString(invariantCulture)},{point.Y.ToString(invariantCulture)} ");
                         }
                         
+                        var color = (polygon.Stroke as SolidColorBrush)?.Color;
+                        string strokeColor = color != null ? $"rgb({color.Value.R},{color.Value.G},{color.Value.B})" : "black";
                         svgBuilder.AppendLine($"<polygon points=\"{points.ToString().Trim()}\" " +
-                                             $"style=\"fill:none; stroke-width:2; stroke:rgb(0,0,0)\"/>");
+                                             $"style=\"fill:none; stroke-width:{polygon.StrokeThickness}; stroke:{strokeColor}\"/>");
                     }
                 }
                 
