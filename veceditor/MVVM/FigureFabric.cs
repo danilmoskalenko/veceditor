@@ -47,46 +47,63 @@ namespace veceditor.MVVM
    }
 
    
-   public class Line : IFigure
+   public class Line : AbstractBaseFigure
    {
       public Point start;
       public Point end;
       public Path? figure;
 
-      public bool _isSelected;
-
-      private Avalonia.Media.Color color;
-      private double _strokeThickness = 2;
-      public Line (Point start, Point end)
+      public Line (Point start, Point end) : base(Point.Origin(start, end))
       {
          this.start = start;
          this.end = end;
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
       public bool IsClosed => throw new NotImplementedException();
-      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
-      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
-      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
 
+      public override IEnumerable<IDrawableFigure> GetDrawFigures()
+      {
+         throw new NotImplementedException();
+      }
 
-      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
-      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
-      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
-      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
-      public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
-      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
-      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      public override IFigure Intersect(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override bool IsInternal(Point p, double eps)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Reflection(Point ax1, Point ax2)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Rotate(Point Center, double angle)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Scale(Point Center, double rad)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Subtract(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Union(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
    }
 
-   public class Circle : ReactiveObject, IFigure
+   public class Circle : AbstractBaseFigure
    {
-      public bool _isSelected;
-      private Avalonia.Media.Color color;
-      private double _strokeThickness = 2;
       public Point center;
       public Point radPoint;
       public bool isPoint;
@@ -111,7 +128,7 @@ namespace veceditor.MVVM
       public double rad;
       public Ellipse? figure;
 
-      public Circle(Point center, Point radPoint, bool isPoint)
+      public Circle(Point center, Point radPoint, bool isPoint) : base(center)
       {
          this.center = center;
          this.radPoint = radPoint;
@@ -127,37 +144,56 @@ namespace veceditor.MVVM
            this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
       }
 
-      
-      public bool IsClosed => throw new NotImplementedException();
-      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
-      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
-      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
-      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
-      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
-      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
-      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
-      public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
-      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
-      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      public override IEnumerable<IDrawableFigure> GetDrawFigures()
+      {
+         throw new NotImplementedException();
+      }
 
+      public override IFigure Intersect(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override bool IsInternal(Point p, double eps)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Reflection(Point ax1, Point ax2)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Scale(Point Center, double rad)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Union(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Subtract(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Rotate(Point Center, double angle)
+      {
+         throw new NotImplementedException();
+      }
    }
 
-   public class Triangle : IFigure
+   public class Triangle : AbstractBaseFigure
    {
-      public bool _isSelected;
-      private Avalonia.Media.Color color;
-      private double _strokeThickness = 2;
       public Point topPoint;
       public Point bottomPoint1;
       public Point bottomPoint2;
       internal Polygon? figure;
 
       //public Ellipse? figure;
-      public Triangle(Point topPoint, Point bottomPoint1)
+      public Triangle(Point topPoint, Point bottomPoint1) : base(Point.Origin(topPoint, bottomPoint1, bottomPoint1.y - topPoint.y > 0.0 ? new Point(topPoint.x - bottomPoint1.x + topPoint.x, bottomPoint1.y) : new Point(bottomPoint1.x, topPoint.y - bottomPoint1.y + topPoint.y)))
       {
          this.topPoint = topPoint;
          this.bottomPoint1 = bottomPoint1;
@@ -189,28 +225,49 @@ namespace veceditor.MVVM
          }
       }
 
-      public bool IsClosed => throw new NotImplementedException();
-      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
-      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
-      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
-      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
-      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
-      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
-      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
-      public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
-      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
-      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      public override IEnumerable<IDrawableFigure> GetDrawFigures()
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Intersect(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override bool IsInternal(Point p, double eps)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Reflection(Point ax1, Point ax2)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Rotate(Point Center, double angle)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Scale(Point Center, double rad)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Subtract(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Union(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
    }
 
-   public class Rectangle : ReactiveObject, IFigure
+   public class Rectangle : AbstractBaseFigure
    {
-      public bool _isSelected;
-      private Avalonia.Media.Color color;
-      private double _strokeThickness = 2;
       private Point topLeft;
       private Point bottomRight;
       public Point _topLeft;
@@ -232,7 +289,7 @@ namespace veceditor.MVVM
       public double Width => Math.Abs(bottomRight.x - topLeft.x);
       public double Height => Math.Abs(bottomRight.y - topLeft.y);
 
-      public Rectangle(Point point1, Point point2)
+      public Rectangle(Point point1, Point point2) : base(Point.Origin(point1, point2)) // центр масс на середине диагонали
       {
          this.topLeft = point1;
          this.bottomRight = point2;
@@ -265,22 +322,48 @@ namespace veceditor.MVVM
          }
       }
 
-      public bool IsClosed => true;
-      public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-      public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
-      public double strokeThickness { get => _strokeThickness; set => _strokeThickness = value; }
-      bool IFigure.isSelected { get => _isSelected; set => _isSelected = value; }
+      public override IEnumerable<IDrawableFigure> GetDrawFigures()
+      {
+         throw new NotImplementedException();
+      }
 
-      public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
-      public IFigure Intersect(IFigure other) => throw new NotImplementedException();
-      public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
-      public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
-      public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
-      public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
-      public IFigure Union(IFigure other) { throw new NotImplementedException(); }
+      public override IFigure Intersect(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override bool IsInternal(Point p, double eps)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Reflection(Point ax1, Point ax2)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Scale(Point Center, double rad)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Union(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override IFigure Subtract(IFigure other)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override void Rotate(Point Center, double angle)
+      {
+         throw new NotImplementedException();
+      }
+
+      public bool IsClosed => true;
+
    }
 
 
@@ -396,7 +479,7 @@ namespace veceditor.MVVM
                circle.figure = null;
             }
          }
-         else if(figure is Rectangle rectangle)
+         else if (figure is Rectangle rectangle)
          {
             if (rectangle.figure != null)
             {

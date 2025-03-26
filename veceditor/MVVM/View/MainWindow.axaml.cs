@@ -40,7 +40,7 @@ namespace veceditor
       public FigureFabric CreatorFigures;
       public MainWindow(MainWindowViewModel viewModel)
       {
-         
+
          InitializeComponent();
          DataContext = viewModel;
          this.viewModel = viewModel;
@@ -57,7 +57,7 @@ namespace veceditor
          this.KeyDown += OnKeyDown;
          _selectedFigure = FigureType.Line;
          Subscribes();
-      
+
       }
       void Subscribes()
       {
@@ -91,7 +91,7 @@ namespace veceditor
             Foreground = Brushes.Red,
          };
          SelText.Text = $"{viewModel._SelectedFigure}";
-         _canvas.Children.Add(SelText); 
+         _canvas.Children.Add(SelText);
       }
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
@@ -181,7 +181,7 @@ namespace veceditor
          }
       }
 
-     private void OnPointerMoved(object? sender, PointerEventArgs e)
+      private void OnPointerMoved(object? sender, PointerEventArgs e)
       {
          if (_points.Count == 1)
          {
@@ -190,7 +190,7 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            switch(_selectedFigure)
+            switch (_selectedFigure)
             {
                case FigureType.Line:
                   Line line = new(start, end);
@@ -231,7 +231,7 @@ namespace veceditor
             {
                InteractFigure(line, false);
             };
-            if(figure.isSelected) { SelectFigure(line); }
+            if (figure.isSelected) { SelectFigure(line); }
          }
          else if (figure is Circle)
          {
@@ -298,7 +298,7 @@ namespace veceditor
          ClearPointList();
          if (figure != null)
          {
-            figure.isSelected = false;            
+            figure.isSelected = false;
             ChangeColor(figure, new SolidColorBrush(figure.ColorFigure));
          }
          //renderer.ReDraw(figure);
@@ -312,7 +312,7 @@ namespace veceditor
          {
             if (circle.isPoint) drawFlag = false;
          }
-         if(drawFlag)
+         if (drawFlag)
             DrawPoints(figure);
          ChangeColor(figure, new SolidColorBrush(Colors.Blue));
          LineView.viewModel.mw = this;
@@ -323,7 +323,7 @@ namespace veceditor
 
       private void DrawPoints(IFigure figure)
       {
-         if(figure is Line line)
+         if (figure is Line line)
          {
             Circle point = new(line.start, new Point(0, 0), true)
             {
@@ -338,7 +338,7 @@ namespace veceditor
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
-         else if(figure is Circle circle)
+         else if (figure is Circle circle)
          {
             Circle point = new(circle.center, new Point(0, 0), true)
             {
@@ -427,49 +427,49 @@ namespace veceditor
             SelText.IsVisible = selTextWasVisible;
          }
       }
-      
+
       private async void OnSaveSvgClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
-            {
-               if (_canvas == null) return;
-      
-               var saveFileDialog = new SaveFileDialog
-               {
-                  Title = "Сохранить как SVG",
-                  Filters = new List<FileDialogFilter>
+      {
+         if (_canvas == null) return;
+
+         var saveFileDialog = new SaveFileDialog
+         {
+            Title = "Сохранить как SVG",
+            Filters = new List<FileDialogFilter>
                   {
                      new FileDialogFilter { Name = "SVG Files", Extensions = new List<string> { "svg" } }
                   },
-                  DefaultExtension = "svg"
-               };
-      
-               var filePath = await saveFileDialog.ShowAsync(this);
-               if (string.IsNullOrEmpty(filePath))
-                  return;
-      
-               // Временно скрываем TextBlock с текущим режимом рисования
-               bool selTextWasVisible = SelText.IsVisible;
-               SelText.IsVisible = false;
-      
-               try
-               {
-                  var success = await SvgExporter.ExportToSvg(_canvas, filePath);
-                  if (success)
-                  {
-                     // Сообщение об успехе
-                     Console.WriteLine("SVG сохранен успешно!");
-                  }
-                  else
-                  {
-                     // Сообщение об ошибке
-                     Console.WriteLine("Не удалось сохранить SVG.");
-                  }
-               }
-               finally
-               {
-                  // Восстанавливаем видимость
-                  SelText.IsVisible = selTextWasVisible;
-               }
+            DefaultExtension = "svg"
+         };
+
+         var filePath = await saveFileDialog.ShowAsync(this);
+         if (string.IsNullOrEmpty(filePath))
+            return;
+
+         // Временно скрываем TextBlock с текущим режимом рисования
+         bool selTextWasVisible = SelText.IsVisible;
+         SelText.IsVisible = false;
+
+         try
+         {
+            var success = await SvgExporter.ExportToSvg(_canvas, filePath);
+            if (success)
+            {
+               // Сообщение об успехе
+               Console.WriteLine("SVG сохранен успешно!");
             }
+            else
+            {
+               // Сообщение об ошибке
+               Console.WriteLine("Не удалось сохранить SVG.");
+            }
+         }
+         finally
+         {
+            // Восстанавливаем видимость
+            SelText.IsVisible = selTextWasVisible;
+         }
+      }
 
       public void ChangeColor(IFigure figure, Brush newColor)
       {
@@ -477,12 +477,12 @@ namespace veceditor
          {
             if (circle.isPoint)
                circle.figure.Fill = newColor;
-            else 
+            else
                circle.figure.Stroke = newColor;
          }
          else if (figure is Line line)
             line.figure.Stroke = newColor;
-         else  if (figure is Rectangle rectangle)
+         else if (figure is Rectangle rectangle)
             rectangle.figure.Stroke = newColor;
          else if (figure is Triangle triangle)
             triangle.figure.Stroke = newColor;
@@ -505,7 +505,7 @@ namespace veceditor
                   i--;
                }
             }
-            while(viewModel.Figures.Count != 0) viewModel.DeleteFigure();
+            while (viewModel.Figures.Count != 0) viewModel.DeleteFigure();
             UnselectFigure(null);
          }
       }
