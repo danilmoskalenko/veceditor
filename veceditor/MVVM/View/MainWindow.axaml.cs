@@ -96,8 +96,8 @@ namespace veceditor
             Foreground = Brushes.Red,
          };
          SelText.Text = "";
-         SelText.Text += "D - удалить\n";
-         SelText.Text += "C - очистка\n";
+         SelText.Text += "Delete - удалить\n";
+         SelText.Text += "Ctrl+C - очистка\n";
          //SelText.Text = $"{viewModel._SelectedFigure}";
          _canvas.Children.Add(SelText); 
       }
@@ -397,6 +397,8 @@ namespace veceditor
       {
          if (_canvas == null) return;
 
+         UnselectFigure(viewModel.CurFigure);
+
          var saveFileDialog = new SaveFileDialog
          {
             Title = "Save as PNG",
@@ -439,6 +441,8 @@ namespace veceditor
       private async void OnSaveSvgClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
       {
          if (_canvas == null) return;
+
+         UnselectFigure(viewModel.CurFigure);
 
          var saveFileDialog = new SaveFileDialog
          {
@@ -511,7 +515,12 @@ namespace veceditor
       {
          figure.Move(vector);
          ReDraw(figure);
-         UpdateSelectionPoints();
+         bool needControlPoint = true;
+         if (figure is Circle circle)
+            if (circle.isPoint)
+               needControlPoint = false;
+         if(needControlPoint)
+            UpdateSelectionPoints();
       }
 
       // Методы перемещения
@@ -696,10 +705,10 @@ namespace veceditor
                case Key.Right:
                   MoveFigure(viewModel.CurFigure, new Point(10, 0));
                   break;
-               case Key.PageUp:
+               case Key.Up:
                   MoveFigure(viewModel.CurFigure, new Point(0, -10));
                   break;
-               case Key.PageDown:
+               case Key.Down:
                   MoveFigure(viewModel.CurFigure, new Point(0, 10));
                   break;
             }
@@ -710,6 +719,8 @@ namespace veceditor
       {
          if (figure == null) return;
 
+         if (figure is Rectangle) return;
+
          // Конвертируем градусы в радианы
          double angleRadians = angleDegrees * Math.PI / 180;
 
@@ -719,12 +730,22 @@ namespace veceditor
 
          // Обновляем отображение
          ReDraw(figure);
-         UpdateSelectionPoints();
+         bool needControlPoint = true;
+         if (figure is Circle circle)
+            if (circle.isPoint)
+               needControlPoint = false;
+         if (needControlPoint)
+            UpdateSelectionPoints();
       }
 
       public void ScaleFigure(IFigure figure, double factor)
       {
          if (figure == null) return;
+         bool isPoint = false;
+         if (figure is Circle circle)
+            if (circle.isPoint)
+               isPoint = true;
+         if (isPoint) return;
 
          // Получаем центр фигуры и выполняем масштабирование
          Point center = figure.GetCenter();
