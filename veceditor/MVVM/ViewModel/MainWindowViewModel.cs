@@ -181,10 +181,20 @@ namespace veceditor.MVVM.ViewModel
          var figure = fabric.Create(pt1, pt2, _SelectedFigure);
          return figure;
       }
+      public IFigure FigureCreateFromJson(Point pt1, Point pt2, FigureType type,
+      Avalonia.Media.Color color, double _strokeThickness)
+      {
+         var figure = fabric.CreateFromJson(pt1, pt2, type, color, _strokeThickness);
+         return figure;
+      }
       //Удаление фигур
       public void DeleteFigure()
       {
          Figures.Remove(curFigure);
+      }
+      public void ClearFigures()
+      {
+         while (Figures.Count > 0) Figures.Remove(curFigure);
       }
    }
 }

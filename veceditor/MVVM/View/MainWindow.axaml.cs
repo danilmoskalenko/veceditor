@@ -79,7 +79,7 @@ namespace veceditor
             tempFigure.RemoveAt(0);
          }
          _selectedFigure = type;
-         SelText.Text = $"{_selectedFigure}";
+         //SelText.Text = $"{_selectedFigure}";
       }
       void DeleteFigure(object sender, IFigure figure)
       {
@@ -95,8 +95,11 @@ namespace veceditor
             Margin = new Thickness(0, 10, 10, 0),
             Foreground = Brushes.Red,
          };
-         SelText.Text = $"{viewModel._SelectedFigure}";
-         _canvas.Children.Add(SelText);
+         SelText.Text = "";
+         SelText.Text += "D - удалить\n";
+         SelText.Text += "C - очистка\n";
+         //SelText.Text = $"{viewModel._SelectedFigure}";
+         _canvas.Children.Add(SelText); 
       }
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
@@ -589,8 +592,8 @@ namespace veceditor
             if (filePaths == null || filePaths.Length == 0)
                return;
             
-            //viewModel.ClearFigures();
-            //UnselectFigure(null);
+            viewModel.ClearFigures();
+            UnselectFigure(null);
             
             var json = await File.ReadAllTextAsync(filePaths[0]);
             var state = JsonConvert.DeserializeObject<ProgramState>(json);
@@ -660,15 +663,7 @@ namespace veceditor
          // Удаление холста
          if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
          {
-            for (int i = 0; i < _canvas.Children.Count; i++)
-            {
-               if (!(_canvas.Children[i] is TextBlock))
-               {
-                  _canvas.Children.Remove(_canvas.Children[i]);
-                  i--;
-               }
-            }
-            while (viewModel.Figures.Count != 0) viewModel.DeleteFigure();
+            viewModel.ClearFigures();
             UnselectFigure(null);
          }
 

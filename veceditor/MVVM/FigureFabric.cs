@@ -21,6 +21,27 @@ namespace veceditor.MVVM
 {
    public class FigureFabric
    {
+      public IFigure CreateFromJson(Point pt1, Point pt2, FigureType type,
+      Avalonia.Media.Color color, double _strokeThickness)
+      {
+         IFigure fig_obj = null;
+         switch (type)
+         {
+            case FigureType.Line:
+               fig_obj = new Line(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Circle:
+               fig_obj = new Circle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Triangle:
+               fig_obj = new Triangle(pt1, pt2, color, _strokeThickness);
+               break;
+            case FigureType.Rectangle:
+               fig_obj = new Rectangle(pt1, pt2, color, _strokeThickness);
+               break;
+         }
+         return fig_obj;
+      }
       public IFigure Create(Point pt1, Point pt2, FigureType type)
       {
          IFigure fig_obj = null;
@@ -70,6 +91,13 @@ namespace veceditor.MVVM
          this.start = start;
          this.end = end;
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+      }
+      public Line(Point start, Point end, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.start = start;
+         this.end = end;
+         ColorFigure = color;
+         this._strokeThickness = strokeThickness;
       }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -172,6 +200,16 @@ namespace veceditor.MVVM
       }
       public double rad;
       public Ellipse? figure;
+      public Circle(Point center, Point radPoint, Avalonia.Media.Color color, double strokeThickness)
+      {
+         this.center = center;
+         this.radPoint = radPoint;
+         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
+         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
+         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+      }
 
       public Circle(Point center, Point radPoint, bool isPoint)
       {
@@ -262,7 +300,7 @@ namespace veceditor.MVVM
 
    }
 
-   public class Triangle : IFigure
+   public class Triangle : ReactiveObject, IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
@@ -270,6 +308,18 @@ namespace veceditor.MVVM
       public Point topPoint;
       public Point bottomPoint1;
       public Point bottomPoint2;
+
+      public Point TopPoint
+      {
+          get => topPoint;
+          set => this.RaiseAndSetIfChanged(ref topPoint, value);              
+      }
+
+      public Point BottomPoint1
+      {
+          get => bottomPoint1;
+          set => this.RaiseAndSetIfChanged(ref bottomPoint1, value);              
+      }
       internal Polygon? figure;
 
       //public Ellipse? figure;
@@ -282,8 +332,19 @@ namespace veceditor.MVVM
          CalculateBottomPoint2();
 
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
       }
-
+      public Triangle(Point topPoint, Point bottomPoint1, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.topPoint = topPoint;
+         this.bottomPoint1 = bottomPoint1;
+         CalculateBottomPoint2();
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
+         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
+      }
       public Point GetCenter()
       {
          return new Point(
@@ -442,8 +503,19 @@ namespace veceditor.MVVM
          UpdatePoint();
 
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
+         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
+         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
       }
-
+      public Rectangle(Point point1, Point point2, Avalonia.Media.Color color, double _strokeThickness)
+      {
+         this.topLeft = point1;
+         this.bottomRight = point2;
+         UpdatePoint();
+         ColorFigure = color;
+         this._strokeThickness = _strokeThickness;
+         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
+         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
+      }
       public void UpdatePoint()
       {
          Point point1 = topLeft;
