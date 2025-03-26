@@ -1,4 +1,4 @@
-﻿﻿using ReactiveUI;
+﻿using ReactiveUI;
 using System.Reactive;
 using System.Windows.Input;
 using System.Reactive.Linq;
@@ -27,10 +27,10 @@ namespace veceditor.MVVM.ViewModel
       //Текущая фигура 
       private IFigure curFigure;
       public IFigure CurFigure
-    {
-        get => curFigure;
-        set => this.RaiseAndSetIfChanged(ref curFigure, value);
-    }
+      {
+         get => curFigure;
+         set => this.RaiseAndSetIfChanged(ref curFigure, value);
+      }
       private bool _isEditMode;
       public ICommand SaveCommand { get; }
       public ICommand LoadCommand { get; }
@@ -41,8 +41,8 @@ namespace veceditor.MVVM.ViewModel
         {
             FigureType.Edit, FigureType.Point, FigureType.Line, FigureType.Circle, FigureType.Rectangle, FigureType.Triangle
         };
-      
-      public ObservableCollection<IFigure> Figures { get; set;}
+
+      public ObservableCollection<IFigure> Figures { get; set; }
 
       // Выбранная фигура (в Меню выбора)
       private FigureType _selectedFigure;
@@ -80,7 +80,7 @@ namespace veceditor.MVVM.ViewModel
          Figures = new ObservableCollection<IFigure>();
          //Инициализация всех подписок
          Subscribes();
-         
+
       }
       private void Subscribes()
       {
@@ -95,16 +95,16 @@ namespace veceditor.MVVM.ViewModel
              )
              .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Remove) // Фильтруем только удаление
              .Select(e => e.EventArgs.OldItems[0] as IFigure)
-             .Subscribe(figure => 
-            {
-               FigureRemoved?.Invoke(this, figure);
-               UpdateCurFigures();
-            });
+             .Subscribe(figure =>
+             {
+                FigureRemoved?.Invoke(this, figure);
+                UpdateCurFigures();
+             });
 
-           
+
       }
       public event EventHandler<IFigure> FigureRemoved;
-       //При удалении/добавлении фигур указатель на текущую фигуру смещается на последний элемент
+      //При удалении/добавлении фигур указатель на текущую фигуру смещается на последний элемент
       public void UpdateCurFigures()
       {
          curFigure = Figures.LastOrDefault();
@@ -164,23 +164,10 @@ namespace veceditor.MVVM.ViewModel
          var figure = fabric.Create(pt1, pt2, _SelectedFigure);
          return figure;
       }
-      public IFigure FigureCreateFromJson(Point pt1, Point pt2, FigureType type,
-      Avalonia.Media.Color color, double _strokeThickness)
-      {
-         var figure = fabric.CreateFromJson(pt1, pt2, type, color, _strokeThickness);
-         return figure;
-      }
       //Удаление фигур
       public void DeleteFigure()
       {
          Figures.Remove(curFigure);
       }
-      public void ClearFigures()
-      {
-         while (Figures.Count > 0) Figures.Remove(curFigure);
-      }
    }
 }
-
-
-      

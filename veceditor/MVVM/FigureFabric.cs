@@ -21,27 +21,6 @@ namespace veceditor.MVVM
 {
    public class FigureFabric
    {
-      public IFigure CreateFromJson(Point pt1, Point pt2, FigureType type,
-      Avalonia.Media.Color color, double _strokeThickness)
-      {
-         IFigure fig_obj = null;
-         switch (type)
-         {
-            case FigureType.Line:
-               fig_obj = new Line(pt1, pt2, color, _strokeThickness);
-               break;
-            case FigureType.Circle:
-               fig_obj = new Circle(pt1, pt2, color, _strokeThickness);
-               break;
-            case FigureType.Triangle:
-               fig_obj = new Triangle(pt1, pt2, color, _strokeThickness);
-               break;
-            case FigureType.Rectangle:
-               fig_obj = new Rectangle(pt1, pt2, color, _strokeThickness);
-               break;
-         }
-         return fig_obj;
-      }
       public IFigure Create(Point pt1, Point pt2, FigureType type)
       {
          IFigure fig_obj = null;
@@ -67,29 +46,30 @@ namespace veceditor.MVVM
       }
    }
 
-   
+
    public class Line : IFigure
    {
       public Point start;
       public Point end;
       public Path? figure;
 
+      public Point GetCenter()
+      {
+         return new Point(
+             (start.x + end.x) / 2,
+             (start.y + end.y) / 2
+         );
+      }
+
       public bool _isSelected;
 
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      public Line (Point start, Point end)
+      public Line(Point start, Point end)
       {
          this.start = start;
          this.end = end;
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
-      }
-      public Line(Point start, Point end, Avalonia.Media.Color color, double _strokeThickness)
-      {
-         this.start = start;
-         this.end = end;
-         ColorFigure = color;
-         this._strokeThickness = strokeThickness;
       }
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -101,11 +81,54 @@ namespace veceditor.MVVM
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
+      public void Move(Point vector)
+      {
+         start = new Point(start.x + vector.x, start.y + vector.y);
+         end = new Point(end.x + vector.x, end.y + vector.y);
+
+         if (figure != null)
+         {
+            var geometry = (LineGeometry)figure.Data;
+            geometry.StartPoint = new Avalonia.Point(start.x, start.y);
+            geometry.EndPoint = new Avalonia.Point(end.x, end.y);
+         }
+      }
       public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
-      public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      public void Rotate(Point Center, double angle)
+      {
+         double cosTheta = Math.Cos(angle);
+         double sinTheta = Math.Sin(angle);
+
+         // Вращение начальной точки
+         double startXRel = start.x - Center.x;
+         double startYRel = start.y - Center.y;
+         double newStartX = Center.x + (startXRel * cosTheta - startYRel * sinTheta);
+         double newStartY = Center.y + (startXRel * sinTheta + startYRel * cosTheta);
+         start = new Point(newStartX, newStartY);
+
+         // Вращение конечной точки
+         double endXRel = end.x - Center.x;
+         double endYRel = end.y - Center.y;
+         double newEndX = Center.x + (endXRel * cosTheta - endYRel * sinTheta);
+         double newEndY = Center.y + (endXRel * sinTheta + endYRel * cosTheta);
+         end = new Point(newEndX, newEndY);
+      }
+      public void Scale(double x, double y)
+      {
+         start = new Point(start.x * x, start.y * y);
+         end = new Point(end.x * x, end.y * y);
+      }
+      public void Scale(Point Center, double factor)
+      {
+         start = new Point(
+             Center.x + (start.x - Center.x) * factor,
+             Center.y + (start.y - Center.y) * factor
+         );
+         end = new Point(
+             Center.x + (end.x - Center.x) * factor,
+             Center.y + (end.y - Center.y) * factor
+         );
+      }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
@@ -115,39 +138,31 @@ namespace veceditor.MVVM
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      private Point center;
-      private Point radPoint;
+      public Point center;
+      public Point radPoint;
       public bool isPoint;
 
       public Point Center
       {
-          get => center;
-          set
-          {             
-               this.RaiseAndSetIfChanged(ref center, value);              
-          }
+         get => center;
+         set
+         {
+            this.RaiseAndSetIfChanged(ref center, value);
+         }
       }
+
+      public Point GetCenter() => center;
 
       public Point RadPoint
       {
-          get => radPoint;
-          set
-          {              
-               this.RaiseAndSetIfChanged(ref radPoint, value);              
-          }
+         get => radPoint;
+         set
+         {
+            this.RaiseAndSetIfChanged(ref radPoint, value);
+         }
       }
       public double rad;
       public Ellipse? figure;
-      public Circle(Point center, Point radPoint, Avalonia.Media.Color color, double strokeThickness)
-      {
-         this.center = center;
-         this.radPoint = radPoint;
-         this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
-         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
-         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
-         ColorFigure = color;
-         this._strokeThickness = _strokeThickness;
-      }
 
       public Circle(Point center, Point radPoint, bool isPoint)
       {
@@ -155,8 +170,8 @@ namespace veceditor.MVVM
          this.radPoint = radPoint;
          this.isPoint = isPoint;
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
-         this.WhenAnyValue(x => x.Center).Subscribe(_=> UpdateRadius());
-         this.WhenAnyValue(x => x.RadPoint).Subscribe(_=> UpdateRadius());
+         this.WhenAnyValue(x => x.Center).Subscribe(_ => UpdateRadius());
+         this.WhenAnyValue(x => x.RadPoint).Subscribe(_ => UpdateRadius());
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
       }
 
@@ -165,7 +180,7 @@ namespace veceditor.MVVM
          this.rad = Math.Sqrt(Math.Pow(center.x - radPoint.x, 2) + Math.Pow(center.y - radPoint.y, 2));
       }
 
-      
+
       public bool IsClosed => throw new NotImplementedException();
       public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
       public Avalonia.Media.Color ColorFigure { get => color; set => color = value; }
@@ -174,36 +189,69 @@ namespace veceditor.MVVM
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
+      public void Move(Point vector)
+      {
+         Center = new Point(Center.x + vector.x, Center.y + vector.y);
+         RadPoint = new Point(RadPoint.x + vector.x, RadPoint.y + vector.y);
+
+         if (figure != null)
+         {
+            Canvas.SetLeft(figure, Center.x - rad);
+            Canvas.SetTop(figure, Center.y - rad);
+         }
+      }
       public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
+      public void Rotate(Point center, double angleRadians)
+      {
+         // Для круга вращаем только точку радиуса
+         radPoint = RotatePoint(radPoint, center, angleRadians);
+      }
+      private Point RotatePoint(Point point, Point center, double angle)
+      {
+         double dx = point.x - center.x;
+         double dy = point.y - center.y;
+
+         return new Point(
+             center.x + dx * Math.Cos(angle) - dy * Math.Sin(angle),
+             center.y + dx * Math.Sin(angle) + dy * Math.Cos(angle)
+         );
+      }
+
       public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      public void Scale(Point center, double factor)
+      {
+         if (isPoint)
+         {
+            // Для точки: перемещаем RadPoint
+            RadPoint = new Point(
+                center.x + (RadPoint.x - center.x) * factor,
+                center.y + (RadPoint.y - center.y) * factor
+            );
+         }
+         else
+         {
+            // Для круга: изменяем радиус и обновляем RadPoint
+            rad *= factor;
+            RadPoint = new Point(
+                Center.x + rad,
+                Center.y
+            );
+            this.RaisePropertyChanged(nameof(RadPoint));
+         }
+      }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
 
    }
 
-   public class Triangle : ReactiveObject, IFigure
+   public class Triangle : IFigure
    {
       public bool _isSelected;
       private Avalonia.Media.Color color;
       private double _strokeThickness = 2;
-      private Point topPoint;
-      private Point bottomPoint1;
+      public Point topPoint;
+      public Point bottomPoint1;
       public Point bottomPoint2;
-
-      public Point TopPoint
-      {
-          get => topPoint;
-          set => this.RaiseAndSetIfChanged(ref topPoint, value);              
-      }
-
-      public Point BottomPoint1
-      {
-          get => bottomPoint1;
-          set => this.RaiseAndSetIfChanged(ref bottomPoint1, value);              
-      }
       internal Polygon? figure;
 
       //public Ellipse? figure;
@@ -216,19 +264,17 @@ namespace veceditor.MVVM
          CalculateBottomPoint2();
 
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
-         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
-         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
       }
-       public Triangle(Point topPoint, Point bottomPoint1, Avalonia.Media.Color color, double _strokeThickness)
+
+      public Point GetCenter()
       {
-         this.topPoint = topPoint;
-         this.bottomPoint1 = bottomPoint1;
-         CalculateBottomPoint2();
-         ColorFigure = color;
-         this._strokeThickness = _strokeThickness;
-         this.WhenAnyValue(x => x.TopPoint).Subscribe(_ => CalculateBottomPoint2());
-         this.WhenAnyValue(x => x.BottomPoint1).Subscribe(_ => CalculateBottomPoint2());
+         return new Point(
+             (topPoint.x + bottomPoint1.x + bottomPoint2.x) / 3,
+             (topPoint.y + bottomPoint1.y + bottomPoint2.y) / 3
+         );
       }
+
+
       // Метод для вычисления второй боковой точки
       public void CalculateBottomPoint2()
       {
@@ -258,14 +304,65 @@ namespace veceditor.MVVM
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
+      public void Move(Point vector)
+      {
+         topPoint = new Point(topPoint.x + vector.x, topPoint.y + vector.y);
+         bottomPoint1 = new Point(bottomPoint1.x + vector.x, bottomPoint1.y + vector.y);
+         bottomPoint2 = new Point(bottomPoint2.x + vector.x, bottomPoint2.y + vector.y);
+
+         if (figure != null)
+         {
+            figure.Points = new AvaloniaList<Avalonia.Point>
+        {
+            new Avalonia.Point(topPoint.x, topPoint.y),
+            new Avalonia.Point(bottomPoint1.x, bottomPoint1.y),
+            new Avalonia.Point(bottomPoint2.x, bottomPoint2.y)
+        };
+         }
+      }
       public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
+      // Поворот всех вершин относительно центра
+      public void Rotate(Point center, double angleRadians)
+      {
+         topPoint = RotatePoint(topPoint, center, angleRadians);
+         bottomPoint1 = RotatePoint(bottomPoint1, center, angleRadians);
+         bottomPoint2 = RotatePoint(bottomPoint2, center, angleRadians);
+      }
+      private Point RotatePoint(Point point, Point center, double angle)
+      {
+         double dx = point.x - center.x;
+         double dy = point.y - center.y;
+
+         return new Point(
+             center.x + dx * Math.Cos(angle) - dy * Math.Sin(angle),
+             center.y + dx * Math.Sin(angle) + dy * Math.Cos(angle)
+         );
+      }
+
       public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      // Масштабирование относительно центра
+      public void Scale(Point center, double factor)
+      {
+         topPoint = new Point(
+             center.x + (topPoint.x - center.x) * factor,
+             center.y + (topPoint.y - center.y) * factor
+         );
+         bottomPoint1 = new Point(
+             center.x + (bottomPoint1.x - center.x) * factor,
+             center.y + (bottomPoint1.y - center.y) * factor
+         );
+         bottomPoint2 = new Point(
+             center.x + (bottomPoint2.x - center.x) * factor,
+             center.y + (bottomPoint2.y - center.y) * factor
+         );
+      }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
+
+
+
+
 
    public class Rectangle : ReactiveObject, IFigure
    {
@@ -278,6 +375,16 @@ namespace veceditor.MVVM
       public Point _bottomRight;
       internal Path? figure;
 
+      // Добавляем свойство для хранения угла поворота
+      private double rotationAngle = 0; // Хранит угол поворота в радианах
+
+      public double RotationAngle
+      {
+         get => rotationAngle;
+         private set => rotationAngle = value % (2 * Math.PI); // Ограничиваем до 360°
+      }
+
+
       public Point TopLeft
       {
          get => topLeft;
@@ -289,6 +396,13 @@ namespace veceditor.MVVM
          get => bottomRight;
          set { this.RaiseAndSetIfChanged(ref bottomRight, value); UpdatePoint(); }
       }
+      public Point GetCenter()
+      {
+         return new Point(
+             (TopLeft.x + BottomRight.x) / 2,
+             (TopLeft.y + BottomRight.y) / 2
+         );
+      }
 
       public double Width => Math.Abs(bottomRight.x - topLeft.x);
       public double Height => Math.Abs(bottomRight.y - topLeft.y);
@@ -299,21 +413,10 @@ namespace veceditor.MVVM
          this.bottomRight = point2;
 
          UpdatePoint();
-         
+
          ColorFigure = Avalonia.Media.Color.FromRgb(0, 0, 0);
-         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
-         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
       }
-      public Rectangle(Point point1, Point point2, Avalonia.Media.Color color, double _strokeThickness)
-      {
-         this.topLeft = point1;
-         this.bottomRight = point2;
-         UpdatePoint();
-         ColorFigure = color;
-         this._strokeThickness = _strokeThickness;
-         this.WhenAnyValue(x => x.TopLeft).Subscribe(_ => UpdatePoint());
-         this.WhenAnyValue(x => x.BottomRight).Subscribe(_ => UpdatePoint());
-      }
+
       public void UpdatePoint()
       {
          Point point1 = topLeft;
@@ -346,11 +449,82 @@ namespace veceditor.MVVM
       public IEnumerable<IDrawableFigure> GetDrawFigures() => throw new NotImplementedException();
       public IFigure Intersect(IFigure other) => throw new NotImplementedException();
       public bool IsInternal(Point p, double eps) => throw new NotImplementedException();
-      public void Move(Point vector) => throw new NotImplementedException();
+      public void Move(Point vector)
+      {
+         TopLeft = new Point(TopLeft.x + vector.x, TopLeft.y + vector.y);
+         BottomRight = new Point(BottomRight.x + vector.x, BottomRight.y + vector.y);
+
+         if (figure != null)
+         {
+            var geometry = (RectangleGeometry)figure.Data;
+            geometry.Rect = new Avalonia.Rect(TopLeft.x, TopLeft.y, Width, Height);
+         }
+      }
       public void Reflection(Point ax1, Point ax2) => throw new NotImplementedException();
-      public void Rotate(Point Center, double angle) => throw new NotImplementedException();
+
+      // Получаем все 4 угла прямоугольника
+      private Point[] GetCorners()
+      {
+         return new Point[]
+         {
+        TopLeft,
+        new Point(BottomRight.x, TopLeft.y),
+        BottomRight,
+        new Point(TopLeft.x, BottomRight.y)
+         };
+      }
+      // Поворот всех углов вокруг центра
+      public void Rotate(Point center, double angle)
+      {
+         // Обновляем угол поворота
+         RotationAngle += angle;
+
+         // Получаем все 4 угла
+         var corners = GetCorners();
+
+         // Поворачиваем каждую точку
+         for (int i = 0; i < corners.Length; i++)
+         {
+            corners[i] = RotatePoint(corners[i], center, angle);
+         }
+
+         // Обновляем границы
+         TopLeft = new Point(
+             corners.Min(p => p.x),
+             corners.Min(p => p.y)
+         );
+         BottomRight = new Point(
+             corners.Max(p => p.x),
+             corners.Max(p => p.y)
+         );
+      }
+
+      private Point RotatePoint(Point point, Point center, double angle)
+      {
+         double cosTheta = Math.Cos(angle);
+         double sinTheta = Math.Sin(angle);
+
+         double dx = point.x - center.x;
+         double dy = point.y - center.y;
+
+         return new Point(
+             center.x + dx * cosTheta - dy * sinTheta,
+             center.y + dx * sinTheta + dy * cosTheta
+         );
+      }
       public void Scale(double x, double y) => throw new NotImplementedException();
-      public void Scale(Point Center, double rad) => throw new NotImplementedException();
+      public void Scale(Point center, double factor)
+      {
+         // Масштабирование только основных точек
+         TopLeft = new Point(
+             center.x + (TopLeft.x - center.x) * factor,
+             center.y + (TopLeft.y - center.y) * factor
+         );
+         BottomRight = new Point(
+             center.x + (BottomRight.x - center.x) * factor,
+             center.y + (BottomRight.y - center.y) * factor
+         );
+      }
       public IFigure Subtract(IFigure other) { throw new NotImplementedException(); }
       public IFigure Union(IFigure other) { throw new NotImplementedException(); }
    }
@@ -372,8 +546,8 @@ namespace veceditor.MVVM
             Fill = new SolidColorBrush(circleObj.ColorFigure)
          };
 
-         Canvas.SetLeft(circle, circleObj.Center.x - 3);
-         Canvas.SetTop(circle, circleObj.Center.y - 3);
+         Canvas.SetLeft(circle, circleObj.center.x - 3);
+         Canvas.SetTop(circle, circleObj.center.y - 3);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
@@ -389,8 +563,8 @@ namespace veceditor.MVVM
             //Fill = Brushes.Transparent
          };
 
-         Canvas.SetLeft(circle, circleObj.Center.x - circleObj.rad);
-         Canvas.SetTop(circle, circleObj.Center.y - circleObj.rad);
+         Canvas.SetLeft(circle, circleObj.center.x - circleObj.rad);
+         Canvas.SetTop(circle, circleObj.center.y - circleObj.rad);
 
          canvas.Children.Add(circle);
          circleObj.figure = circle;
@@ -437,8 +611,8 @@ namespace veceditor.MVVM
          {
             Points = new AvaloniaList<Avalonia.Point>
         {
-            new Avalonia.Point(triangle.TopPoint.x, triangle.TopPoint.y),
-            new Avalonia.Point(triangle.BottomPoint1.x, triangle.BottomPoint1.y),
+            new Avalonia.Point(triangle.topPoint.x, triangle.topPoint.y),
+            new Avalonia.Point(triangle.bottomPoint1.x, triangle.bottomPoint1.y),
             new Avalonia.Point(triangle.bottomPoint2.x, triangle.bottomPoint2.y)
         },
             Stroke = new SolidColorBrush(triangle.ColorFigure),
@@ -468,7 +642,7 @@ namespace veceditor.MVVM
                circle.figure = null;
             }
          }
-         else if(figure is Rectangle rectangle)
+         else if (figure is Rectangle rectangle)
          {
             if (rectangle.figure != null)
             {
@@ -487,7 +661,3 @@ namespace veceditor.MVVM
       }
    }
 }
-
-   
-  
-   

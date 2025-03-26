@@ -181,8 +181,8 @@ namespace veceditor.MVVM.ViewModel
          }
          else if (currentFigure is Triangle triangle)
          {
-            triangle.TopPoint = new Point(X1, Y1);
-            triangle.BottomPoint1 = new Point(X2, Y2);
+            triangle.topPoint = new Point(X1, Y1);
+            triangle.bottomPoint1 = new Point(X2, Y2);
 
             triangle.strokeThickness = StrokeThickness;
             triangle.ColorFigure = new Avalonia.Media.Color(Color_A, Color_R, Color_G, Color_B);

@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using ReactiveUI;
 using System;
@@ -40,7 +41,7 @@ namespace veceditor
       public FigureFabric CreatorFigures;
       public MainWindow(MainWindowViewModel viewModel)
       {
-         
+
          InitializeComponent();
          DataContext = viewModel;
          this.viewModel = viewModel;
@@ -57,7 +58,7 @@ namespace veceditor
          this.KeyDown += OnKeyDown;
          _selectedFigure = FigureType.Line;
          Subscribes();
-      
+
       }
       void Subscribes()
       {
@@ -74,7 +75,7 @@ namespace veceditor
             tempFigure.RemoveAt(0);
          }
          _selectedFigure = type;
-         //SelText.Text = $"{_selectedFigure}";
+         SelText.Text = $"{_selectedFigure}";
       }
       void DeleteFigure(object sender, IFigure figure)
       {
@@ -90,13 +91,9 @@ namespace veceditor
             Margin = new Thickness(0, 10, 10, 0),
             Foreground = Brushes.Red,
          };
-         SelText.Text = "";
-         SelText.Text += "D - удалить\n";
-         SelText.Text += "C - очистка\n";
-         //SelText.Text = $"{viewModel._SelectedFigure}";
-         _canvas.Children.Add(SelText); 
+         SelText.Text = $"{viewModel._SelectedFigure}";
+         _canvas.Children.Add(SelText);
       }
-      
       private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
       {
          if (_canvas == null) return;
@@ -129,9 +126,7 @@ namespace veceditor
 
 
             case FigureType.Line:
-
                if (_points.Count % 2 != 0) break;
-
                var line = viewModel.FigureCreate(_points[^2], _points[^1]) as Line;
                renderer.DrawLine(line);
                _points.Clear();
@@ -187,7 +182,7 @@ namespace veceditor
          }
       }
 
-     private void OnPointerMoved(object? sender, PointerEventArgs e)
+      private void OnPointerMoved(object? sender, PointerEventArgs e)
       {
          if (_points.Count == 1)
          {
@@ -196,7 +191,7 @@ namespace veceditor
             if (_canvas == null) return;
             if (Aend.X < 0 || Aend.Y < 0 || Aend.X > _canvas.Bounds.Width || Aend.Y > _canvas.Bounds.Height) return;
             Point end = new(Aend.X, Aend.Y);
-            switch(_selectedFigure)
+            switch (_selectedFigure)
             {
                case FigureType.Line:
                   Line line = new(start, end);
@@ -237,7 +232,7 @@ namespace veceditor
             {
                InteractFigure(line, false);
             };
-            if(figure.isSelected) { SelectFigure(line); }
+            if (figure.isSelected) { SelectFigure(line); }
          }
          else if (figure is Circle)
          {
@@ -304,7 +299,7 @@ namespace veceditor
          ClearPointList();
          if (figure != null)
          {
-            figure.isSelected = false;            
+            figure.isSelected = false;
             ChangeColor(figure, new SolidColorBrush(figure.ColorFigure));
          }
          //renderer.ReDraw(figure);
@@ -318,7 +313,7 @@ namespace veceditor
          {
             if (circle.isPoint) drawFlag = false;
          }
-         if(drawFlag)
+         if (drawFlag)
             DrawPoints(figure);
          ChangeColor(figure, new SolidColorBrush(Colors.Blue));
          LineView.viewModel.mw = this;
@@ -329,7 +324,7 @@ namespace veceditor
 
       private void DrawPoints(IFigure figure)
       {
-         if(figure is Line line)
+         if (figure is Line line)
          {
             Circle point = new(line.start, new Point(0, 0), true)
             {
@@ -344,15 +339,15 @@ namespace veceditor
             renderer.DrawPoint(point);
             selectPointList.Add(point);
          }
-         else if(figure is Circle circle)
+         else if (figure is Circle circle)
          {
-            Circle point = new(circle.Center, new Point(0, 0), true)
+            Circle point = new(circle.center, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(circle.RadPoint, new Point(0, 0), true)
+            point = new(circle.radPoint, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
@@ -376,13 +371,13 @@ namespace veceditor
          }
          else if (figure is Triangle triangle)
          {
-            Circle point = new(triangle.TopPoint, new Point(0, 0), true)
+            Circle point = new(triangle.topPoint, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
             renderer.DrawPoint(point);
             selectPointList.Add(point);
-            point = new(triangle.BottomPoint1, new Point(0, 0), true)
+            point = new(triangle.bottomPoint1, new Point(0, 0), true)
             {
                ColorFigure = Colors.Red
             };
@@ -433,49 +428,109 @@ namespace veceditor
             SelText.IsVisible = selTextWasVisible;
          }
       }
-      
+
       private async void OnSaveSvgClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
-            {
-               if (_canvas == null) return;
-      
-               var saveFileDialog = new SaveFileDialog
-               {
-                  Title = "Сохранить как SVG",
-                  Filters = new List<FileDialogFilter>
+      {
+         if (_canvas == null) return;
+
+         var saveFileDialog = new SaveFileDialog
+         {
+            Title = "Сохранить как SVG",
+            Filters = new List<FileDialogFilter>
                   {
                      new FileDialogFilter { Name = "SVG Files", Extensions = new List<string> { "svg" } }
                   },
-                  DefaultExtension = "svg"
-               };
-      
-               var filePath = await saveFileDialog.ShowAsync(this);
-               if (string.IsNullOrEmpty(filePath))
-                  return;
-      
-               // Временно скрываем TextBlock с текущим режимом рисования
-               bool selTextWasVisible = SelText.IsVisible;
-               SelText.IsVisible = false;
-      
-               try
-               {
-                  var success = await SvgExporter.ExportToSvg(_canvas, filePath);
-                  if (success)
-                  {
-                     // Сообщение об успехе
-                     Console.WriteLine("SVG сохранен успешно!");
-                  }
-                  else
-                  {
-                     // Сообщение об ошибке
-                     Console.WriteLine("Не удалось сохранить SVG.");
-                  }
-               }
-               finally
-               {
-                  // Восстанавливаем видимость
-                  SelText.IsVisible = selTextWasVisible;
-               }
+            DefaultExtension = "svg"
+         };
+
+         var filePath = await saveFileDialog.ShowAsync(this);
+         if (string.IsNullOrEmpty(filePath))
+            return;
+
+         // Временно скрываем TextBlock с текущим режимом рисования
+         bool selTextWasVisible = SelText.IsVisible;
+         SelText.IsVisible = false;
+
+         try
+         {
+            var success = await SvgExporter.ExportToSvg(_canvas, filePath);
+            if (success)
+            {
+               // Сообщение об успехе
+               Console.WriteLine("SVG сохранен успешно!");
             }
+            else
+            {
+               // Сообщение об ошибке
+               Console.WriteLine("Не удалось сохранить SVG.");
+            }
+         }
+         finally
+         {
+            // Восстанавливаем видимость
+            SelText.IsVisible = selTextWasVisible;
+         }
+      }
+      // Поворот на 15° влево
+      private void OnRotateLeftClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure is null) return;
+         RotateFigure(viewModel.CurFigure, -15);
+      }
+
+      // Поворот на 15° вправо
+      private void OnRotateRightClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure is null) return;
+         RotateFigure(viewModel.CurFigure, 15);
+      }
+
+      // Уменьшение масштаба на 10%
+      private void OnScaleDownClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure is null) return;
+         ScaleFigure(viewModel.CurFigure, 0.9);
+      }
+
+      // Увеличение масштаба на 10%
+      private void OnScaleUpClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure is null) return;
+         ScaleFigure(viewModel.CurFigure, 1.1);
+      }
+
+      // Метод перемещения
+      private void MoveFigure(IFigure figure, Point vector)
+      {
+         figure.Move(vector);
+         ReDraw(figure);
+         UpdateSelectionPoints();
+      }
+
+      // Методы перемещения
+      private void OnMoveLeftClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure == null) return;
+         MoveFigure(viewModel.CurFigure, new Point(-10, 0));
+      }
+
+      private void OnMoveRightClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure == null) return;
+         MoveFigure(viewModel.CurFigure, new Point(10, 0));
+      }
+
+      private void OnMoveUpClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure == null) return;
+         MoveFigure(viewModel.CurFigure, new Point(0, -10));
+      }
+
+      private void OnMoveDownClick(object sender, RoutedEventArgs e)
+      {
+         if (viewModel.CurFigure == null) return;
+         MoveFigure(viewModel.CurFigure, new Point(0, 10));
+      }
 
       public void ChangeColor(IFigure figure, Brush newColor)
       {
@@ -483,12 +538,12 @@ namespace veceditor
          {
             if (circle.isPoint)
                circle.figure.Fill = newColor;
-            else 
+            else
                circle.figure.Stroke = newColor;
          }
          else if (figure is Line line)
             line.figure.Stroke = newColor;
-         else  if (figure is Rectangle rectangle)
+         else if (figure is Rectangle rectangle)
             rectangle.figure.Stroke = newColor;
          else if (figure is Triangle triangle)
             triangle.figure.Stroke = newColor;
@@ -496,16 +551,107 @@ namespace veceditor
 
       public void OnKeyDown(object sender, KeyEventArgs e)
       {
-         if (e.Key == Key.D)
+
+         base.OnKeyDown(e);
+
+         // Удаление фигуры
+         if (e.Key == Key.Delete)
          {
             viewModel.DeleteFigure();
             InteractFigure(viewModel.CurFigure, true);
          }
-         if (e.Key == Key.C)
+
+         // Удаление холста
+         if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
          {
-            viewModel.ClearFigures();
+            for (int i = 0; i < _canvas.Children.Count; i++)
+            {
+               if (!(_canvas.Children[i] is TextBlock))
+               {
+                  _canvas.Children.Remove(_canvas.Children[i]);
+                  i--;
+               }
+            }
+            while (viewModel.Figures.Count != 0) viewModel.DeleteFigure();
             UnselectFigure(null);
+         }
+
+         if (e.KeyModifiers == KeyModifiers.None)
+         {
+            switch (e.Key)
+            {
+               case Key.R: // Поворот направо
+                  RotateFigure(viewModel.CurFigure, 15);
+                  break;
+               case Key.L: // Поворот налево
+                  RotateFigure(viewModel.CurFigure, -15);
+                  break;
+               case Key.B: // Увеличение
+                  ScaleFigure(viewModel.CurFigure, 1.1);
+                  break;
+               case Key.S: // Уменьшение
+                  ScaleFigure(viewModel.CurFigure, 0.9);
+                  break;
+            }
+         }
+         // Перемещение
+         if (e.KeyModifiers == KeyModifiers.None || e.KeyModifiers == KeyModifiers.Alt)
+         {
+            switch (e.Key)
+            {
+               case Key.Left:
+                  MoveFigure(viewModel.CurFigure, new Point(-10, 0));
+                  break;
+               case Key.Right:
+                  MoveFigure(viewModel.CurFigure, new Point(10, 0));
+                  break;
+               case Key.PageUp:
+                  MoveFigure(viewModel.CurFigure, new Point(0, -10));
+                  break;
+               case Key.PageDown:
+                  MoveFigure(viewModel.CurFigure, new Point(0, 10));
+                  break;
+            }
+         }
+      }
+
+      public void RotateFigure(IFigure figure, double angleDegrees)
+      {
+         if (figure == null) return;
+
+         // Конвертируем градусы в радианы
+         double angleRadians = angleDegrees * Math.PI / 180;
+
+         // Получаем центр фигуры и выполняем поворот
+         Point center = figure.GetCenter();
+         figure.Rotate(center, angleRadians);
+
+         // Обновляем отображение
+         ReDraw(figure);
+         UpdateSelectionPoints();
+      }
+
+      public void ScaleFigure(IFigure figure, double factor)
+      {
+         if (figure == null) return;
+
+         // Получаем центр фигуры и выполняем масштабирование
+         Point center = figure.GetCenter();
+         figure.Scale(center, factor);
+
+         // Обновляем отображение
+         ReDraw(figure);
+         UpdateSelectionPoints();
+      }
+
+      private void UpdateSelectionPoints()
+      {
+         if (viewModel.CurFigure != null)
+         {
+            ClearPointList();
+            DrawPoints(viewModel.CurFigure);
          }
       }
    }
+
 }

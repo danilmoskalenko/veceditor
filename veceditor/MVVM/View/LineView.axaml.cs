@@ -73,11 +73,11 @@ namespace veceditor.MVVM.View
          }
          else if (figure is Triangle triangle)
          {
-            viewModel.X1 = triangle.TopPoint.x;
-            viewModel.Y1 = triangle.TopPoint.y;
+            viewModel.X1 = triangle.topPoint.x;
+            viewModel.Y1 = triangle.topPoint.y;
 
-            viewModel.X2 = triangle.BottomPoint1.x;
-            viewModel.Y2 = triangle.BottomPoint1.y;
+            viewModel.X2 = triangle.bottomPoint1.x;
+            viewModel.Y2 = triangle.bottomPoint1.y;
 
             viewModel.StrokeThickness = triangle.strokeThickness;
 
