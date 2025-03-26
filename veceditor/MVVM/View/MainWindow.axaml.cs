@@ -14,6 +14,10 @@ using veceditor.MVVM.ViewModel;
 using Line = veceditor.MVVM.Line;
 using Point = veceditor.MVVM.Model.Point;
 using Rectangle = veceditor.MVVM.Rectangle;
+using Newtonsoft.Json;
+using System.Data;
+using System.Linq;
+using System.IO;
 
 namespace veceditor
 {
@@ -476,6 +480,98 @@ namespace veceditor
                   SelText.IsVisible = selTextWasVisible;
                }
             }
+
+      private async void OnSaveStateClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         try
+         {
+            if (_canvas == null) return;
+
+            var saveFileDialog = new SaveFileDialog
+            {
+               Title = "Save State",
+               Filters = new List<FileDialogFilter>
+               {
+                  new FileDialogFilter { Name = "JSON Files", Extensions = new List<string> { "json" } }
+               },
+               DefaultExtension = "json"
+            };
+
+            var filePath = await saveFileDialog.ShowAsync(this);
+            if (string.IsNullOrEmpty(filePath))
+               return;
+            
+            var state = new ProgramState
+            {
+               Figures = viewModel.Figures.ToList().Select(figure => figure.getFigureData()).ToList()
+            };
+            
+            var json = JsonConvert.SerializeObject(state, Formatting.Indented);
+            await File.WriteAllTextAsync(filePath, json);
+         }
+         catch (Exception ex)
+         {
+            Console.WriteLine($"Error saving state: {ex.Message}");
+         }
+      }
+
+      private async void OnLoadStateClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+      {
+         try
+         {
+            if (_canvas == null) return;
+
+            var openFileDialog = new OpenFileDialog
+            {
+               Title = "Load State",
+               Filters = new List<FileDialogFilter>
+               {
+                  new FileDialogFilter { Name = "JSON Files", Extensions = new List<string> { "json" } }
+               }
+            };
+
+            var filePaths = await openFileDialog.ShowAsync(this);
+            if (filePaths == null || filePaths.Length == 0)
+               return;
+            
+            //viewModel.ClearFigures();
+            //UnselectFigure(null);
+            
+            var json = await File.ReadAllTextAsync(filePaths[0]);
+            var state = JsonConvert.DeserializeObject<ProgramState>(json);
+
+            foreach (var figureData in state.Figures)
+            {
+               FigureType type = figureData.Type switch
+               {
+                  "Line" => FigureType.Line,
+                  "Circle" => FigureType.Circle,
+                  "Rectangle" => FigureType.Rectangle,
+                  "Point" => FigureType.Point,
+                  "Triangle" => FigureType.Triangle,
+                  _ => FigureType.Edit
+               };
+               
+               if (type == FigureType.Edit) throw new DataException($"Invalid figure type: {figureData.Type}");
+
+               var p1 = figureData.Start.ToPoint();
+               var p2 = figureData.End.ToPoint();
+               var color =  figureData.Color;
+               var thickness = figureData.StrokeThickness;
+               FigureFabric figureFabric = new FigureFabric();
+               
+               IFigure figure =  figureFabric.CreateFromJson(p1, p2, type, color, thickness);
+               
+               ReDraw(figure);
+               viewModel.Figures.Add(figure);
+            }
+            
+         }
+         catch (Exception ex)
+         {
+            Console.WriteLine($"Error saving state: {ex.Message}");
+         }
+      }
 
       public void ChangeColor(IFigure figure, Brush newColor)
       {

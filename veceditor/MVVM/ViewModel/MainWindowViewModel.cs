@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Point = veceditor.MVVM.Model.Point;
 using veceditor.MVVM.Model;
 using Avalonia.Rendering;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using vecedidor.MVVM.ViewModel;
 using System.Collections.Specialized;
@@ -138,8 +139,25 @@ namespace veceditor.MVVM.ViewModel
          }
       }
 
-      private void SaveAction()
+      public MainWindow window { get; set; }
+      private async void SaveAction()
       {
+         try
+         {
+            
+            var state = new ProgramState
+            {
+               Figures = this.Figures.ToList().Select(figure => figure.getFigureData()).ToList()
+            };
+            
+            var json = JsonConvert.SerializeObject(state, Formatting.Indented);
+            
+            Console.WriteLine(json);
+         }
+         catch (Exception ex)
+         {
+            Console.WriteLine($"Error saving state: {ex.Message}");
+         }
       }
 
       private void LoadAction()
